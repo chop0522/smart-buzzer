@@ -11,11 +11,23 @@ interface RoomFeedPayload {
   sentAt: string;
 }
 
+const ROOM_SYNC_POLL_MS = 1500;
+
 export function useRoomFeed(
   code: string | null,
   onRoomUpdate: (room: RoomSnapshot) => void,
 ) {
   const emitUpdate = useEffectEvent(onRoomUpdate);
+  const syncSnapshot = useEffectEvent(async (targetCode: string) => {
+    try {
+      const payload = await fetchJson<{ room: RoomSnapshot }>(`/api/rooms/${targetCode}`, {
+        cache: "no-store",
+      });
+      emitUpdate(payload.room);
+    } catch {
+      // Best-effort sync. The next poll or broadcast can recover.
+    }
+  });
 
   useEffect(() => {
     if (!code) {
@@ -23,44 +35,47 @@ export function useRoomFeed(
     }
 
     const supabase = getSupabaseBrowserClient();
+    const interval = window.setInterval(() => {
+      void syncSnapshot(code);
+    }, ROOM_SYNC_POLL_MS);
 
-    if (!supabase) {
-      const interval = window.setInterval(async () => {
-        try {
-          const payload = await fetchJson<{ room: RoomSnapshot }>(
-            `/api/rooms/${code}`,
-            {
-              cache: "no-store",
-            },
-          );
-          emitUpdate(payload.room);
-        } catch {
-          // Polling fallback is best-effort in local demo mode.
+    void syncSnapshot(code);
+
+    let channel:
+      | ReturnType<NonNullable<typeof supabase>["channel"]>
+      | null = null;
+
+    if (supabase) {
+      channel = supabase.channel(getRoomTopic(code), {
+        config: {
+          broadcast: { self: true },
+          private: false,
+        },
+      });
+
+      channel.on("broadcast", { event: "room.sync" }, ({ payload }) => {
+        const nextPayload = payload as RoomFeedPayload;
+        if (nextPayload.room) {
+          emitUpdate(nextPayload.room);
+          return;
         }
-      }, 2500);
 
-      return () => {
-        window.clearInterval(interval);
-      };
+        void syncSnapshot(code);
+      });
+
+      channel.subscribe((status) => {
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          void syncSnapshot(code);
+        }
+      });
     }
 
-    const channel = supabase.channel(getRoomTopic(code), {
-      config: {
-        broadcast: { self: true },
-      },
-    });
-
-    channel.on("broadcast", { event: "room.sync" }, ({ payload }) => {
-      const nextPayload = payload as RoomFeedPayload;
-      if (nextPayload.room) {
-        emitUpdate(nextPayload.room);
-      }
-    });
-
-    channel.subscribe();
-
     return () => {
-      void supabase.removeChannel(channel);
+      window.clearInterval(interval);
+
+      if (supabase && channel) {
+        void supabase.removeChannel(channel);
+      }
     };
   }, [code]);
 }

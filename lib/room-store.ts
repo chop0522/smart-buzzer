@@ -2,7 +2,7 @@ import "server-only";
 
 import { randomUUID } from "node:crypto";
 import { AppError } from "@/lib/errors";
-import { getParticipantLimit } from "@/lib/plans";
+import { getParticipantLimit, getUpgradeMessage, normalizeExtraPackQuantity } from "@/lib/plans";
 import type {
   HostAccount,
   Participant,
@@ -38,8 +38,10 @@ function buildAccount(hostId: string): HostAccount {
     plan: "free",
     status: "inactive",
     participantLimit: getParticipantLimit("free"),
+    extraPackQuantity: 0,
     stripeCustomerId: null,
     stripeSubscriptionId: null,
+    stripeSubscriptionStatus: null,
     lastUpdatedAt: nowIso(),
   };
 }
@@ -58,6 +60,7 @@ function buildEmptyRoom(hostId: string, hostName: string, code: string): RoomSna
       plan: account.plan,
       status: account.status,
       participantLimit: account.participantLimit,
+      extraPackQuantity: account.extraPackQuantity,
     },
     participants: [],
     round: {
@@ -96,6 +99,7 @@ function syncRoomSubscription(room: RoomSnapshot) {
     plan: account.plan,
     status: account.status,
     participantLimit: account.participantLimit,
+    extraPackQuantity: account.extraPackQuantity,
   };
   room.updatedAt = nowIso();
 }
@@ -161,19 +165,25 @@ export function setHostSubscriptionPlan(
   hostId: string,
   plan: SubscriptionPlan,
   status: SubscriptionStatus,
+  extraPackQuantity = 0,
   stripeData?: {
     stripeCustomerId: string | null;
     stripeSubscriptionId: string | null;
+    stripeSubscriptionStatus?: string | null;
   },
 ) {
   const account = getHostAccount(hostId);
+  const normalizedExtraPackQuantity = normalizeExtraPackQuantity(extraPackQuantity);
   account.plan = plan;
   account.status = status;
-  account.participantLimit = getParticipantLimit(plan);
+  account.extraPackQuantity = normalizedExtraPackQuantity;
+  account.participantLimit = getParticipantLimit(plan, normalizedExtraPackQuantity);
   account.lastUpdatedAt = nowIso();
   account.stripeCustomerId = stripeData?.stripeCustomerId ?? account.stripeCustomerId;
   account.stripeSubscriptionId =
     stripeData?.stripeSubscriptionId ?? account.stripeSubscriptionId;
+  account.stripeSubscriptionStatus =
+    stripeData?.stripeSubscriptionStatus ?? account.stripeSubscriptionStatus;
 
   for (const room of listRoomsForHost(hostId)) {
     const liveRoom = findRoom(room.code);
@@ -265,7 +275,7 @@ export function joinRoom(code: string, name: string) {
 
   if (room.participants.length >= room.subscription.participantLimit) {
     throw new AppError(
-      `このルームは ${room.subscription.participantLimit} 人までです。課金状態はサーバー側で検証されています。`,
+      getUpgradeMessage(room.subscription.participantLimit),
       403,
     );
   }

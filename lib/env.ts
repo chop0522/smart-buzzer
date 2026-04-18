@@ -12,7 +12,9 @@ export const serverEnv = {
   hostSessionSecret: process.env.HOST_SESSION_SECRET ?? "",
   stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? "",
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
+  stripePriceStarterMonthly: process.env.STRIPE_PRICE_STARTER_MONTHLY ?? "",
   stripePriceProMonthly: process.env.STRIPE_PRICE_PRO_MONTHLY ?? "",
+  stripePriceExtraPackMonthly: process.env.STRIPE_PRICE_EXTRA_PACK_MONTHLY ?? "",
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
 };
 
@@ -28,6 +30,16 @@ export function isStripeConfigured() {
   return Boolean(
     serverEnv.stripeSecretKey &&
       serverEnv.stripeWebhookSecret &&
-      serverEnv.stripePriceProMonthly,
+      serverEnv.stripePriceStarterMonthly &&
+      serverEnv.stripePriceProMonthly &&
+      serverEnv.stripePriceExtraPackMonthly,
   );
+}
+
+export function isSupabaseConfigured() {
+  return Boolean(publicEnv.supabaseUrl && publicEnv.supabasePublishableKey);
+}
+
+export function isSupabaseAdminConfigured() {
+  return Boolean(isSupabaseConfigured() && serverEnv.supabaseServiceRoleKey);
 }

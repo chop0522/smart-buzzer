@@ -1,5 +1,10 @@
-export type SubscriptionPlan = "free" | "pro";
-export type SubscriptionStatus = "inactive" | "active" | "past_due";
+export type SubscriptionPlan = "free" | "starter" | "pro";
+export type SubscriptionStatus =
+  | "inactive"
+  | "active"
+  | "trialing"
+  | "past_due"
+  | "canceled";
 export type RoundStatus = "idle" | "open" | "closed";
 export type ParticipantResult = "waiting" | "first" | "second" | "locked_out";
 
@@ -9,8 +14,10 @@ export interface HostAccount {
   plan: SubscriptionPlan;
   status: SubscriptionStatus;
   participantLimit: number;
+  extraPackQuantity: number;
   stripeCustomerId: string | null;
   stripeSubscriptionId: string | null;
+  stripeSubscriptionStatus: string | null;
   lastUpdatedAt: string;
 }
 
@@ -46,6 +53,7 @@ export interface RoomSnapshot {
     plan: SubscriptionPlan;
     status: SubscriptionStatus;
     participantLimit: number;
+    extraPackQuantity: number;
   };
   participants: Participant[];
   round: RoundState;

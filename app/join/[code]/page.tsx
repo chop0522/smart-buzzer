@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { isSupabaseConfigured } from "@/lib/env";
 import { getRoomSnapshot } from "@/lib/room-store";
+import { createClient } from "@/lib/supabase/server";
+import { getRoomSnapshotFromSupabase } from "@/lib/supabase-room-service";
 
 export default async function JoinPage({
   params,
@@ -8,7 +11,12 @@ export default async function JoinPage({
 }) {
   const { code } = await params;
   const normalizedCode = code.toUpperCase();
-  const room = getRoomSnapshot(normalizedCode);
+  const room = isSupabaseConfigured()
+    ? await getRoomSnapshotFromSupabase(await createClient(), normalizedCode)
+    : getRoomSnapshot(normalizedCode);
+  const isAtCapacity = room
+    ? room.participants.length >= room.subscription.participantLimit
+    : false;
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-5">
@@ -58,6 +66,12 @@ export default async function JoinPage({
             トップへ戻る
           </Link>
         </div>
+
+        {isAtCapacity ? (
+          <div className="mt-4 rounded-2xl border border-amber-300/25 bg-amber-300/10 p-4 text-sm leading-7 text-amber-50">
+            このルームは現在満員です。ホストは `/account` または `/pricing` から Starter / Pro / Extra Pack を追加してください。
+          </div>
+        ) : null}
       </section>
     </div>
   );

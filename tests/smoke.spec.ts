@@ -22,3 +22,14 @@ test("top page and demo join flow render on mobile", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByText(uniqueName).first()).toBeVisible();
 });
+
+test("pricing page shows billing tiers", async ({ page }) => {
+  await page.goto("/pricing");
+
+  await expect(
+    page.getByRole("heading", { name: /料金プラン比較/i }),
+  ).toBeVisible();
+  await expect(page.getByText("Starter", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("Pro", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText(/Extra Pack/i).first()).toBeVisible();
+});

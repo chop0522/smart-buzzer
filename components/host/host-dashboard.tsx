@@ -5,6 +5,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRoomFeed } from "@/hooks/use-room-feed";
 import { fetchJson } from "@/lib/fetch-json";
 import { formatDateTime } from "@/lib/format";
+import { PLAN_CATALOG } from "@/lib/plans";
 import type { HostAccount, RoomSnapshot } from "@/lib/types";
 
 interface HostDashboardProps {
@@ -86,10 +87,10 @@ export function HostDashboard({
                 Current Plan
               </p>
               <p className="mt-2 text-2xl font-semibold text-white">
-                {account.plan === "pro" ? "Pro" : "Free"}
+                {PLAN_CATALOG[account.plan].name}
               </p>
               <p className="mt-1 text-sm text-slate-300">
-                上限 {account.participantLimit} 人 / status {account.status}
+                上限 {account.participantLimit} 人 / extra {account.extraPackQuantity} / status {account.status}
               </p>
             </article>
             <article className="rounded-3xl border border-white/10 bg-white/5 p-4">

@@ -17,6 +17,10 @@ function resolveResultLabel(room: RoomSnapshot | null, participantId: string | n
   return participant?.lastResult ?? "waiting";
 }
 
+function isUpgradeGuidanceMessage(message: string | null) {
+  return Boolean(message && message.includes("Starter / Pro / Extra Pack"));
+}
+
 export function ParticipantRoom({
   code,
   initialRoom,
@@ -230,9 +234,27 @@ export function ParticipantRoom({
           )}
 
           {message ? (
-            <p className="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">
-              {message}
-            </p>
+            <div className="space-y-3">
+              <p className="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">
+                {message}
+              </p>
+              {isUpgradeGuidanceMessage(message) ? (
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Link
+                    href="/pricing"
+                    className="rounded-2xl bg-cyan-300 px-4 py-3 text-center text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
+                  >
+                    料金プランを見る
+                  </Link>
+                  <Link
+                    href="/account"
+                    className="rounded-2xl border border-white/15 px-4 py-3 text-center text-sm font-semibold text-slate-100 transition hover:bg-white/5"
+                  >
+                    ホストの契約状況へ
+                  </Link>
+                </div>
+              ) : null}
+            </div>
           ) : null}
         </div>
       </section>
