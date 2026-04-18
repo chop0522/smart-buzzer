@@ -1,4 +1,6 @@
+import type Stripe from "stripe";
 import { isStripeConfigured, serverEnv } from "@/lib/env";
+import { toAppError } from "@/lib/errors";
 import { jsonError, jsonOk } from "@/lib/http";
 import { handleStripeEvent, getStripeClient } from "@/lib/stripe";
 
@@ -20,19 +22,26 @@ export async function POST(request: Request) {
   }
 
   const body = await request.text();
+  let event: Stripe.Event;
 
   try {
-    const event = stripe.webhooks.constructEvent(
+    event = stripe.webhooks.constructEvent(
       body,
       signature,
       serverEnv.stripeWebhookSecret,
     );
-    await handleStripeEvent(event);
-    return jsonOk({ received: true });
   } catch (error) {
     return jsonError(
       error instanceof Error ? error.message : "Webhook 検証に失敗しました。",
       400,
     );
+  }
+
+  try {
+    const result = await handleStripeEvent(event);
+    return jsonOk({ received: true, duplicate: result.duplicate });
+  } catch (error) {
+    const appError = toAppError(error);
+    return jsonError(appError.message, appError.status);
   }
 }

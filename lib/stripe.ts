@@ -8,7 +8,12 @@ import {
   normalizeExtraPackQuantity,
 } from "@/lib/plans";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { upsertHostSubscriptionWithAdmin } from "@/lib/supabase-room-service";
+import {
+  claimStripeEventWithAdmin,
+  completeStripeEventWithAdmin,
+  failStripeEventWithAdmin,
+  upsertHostSubscriptionWithAdmin,
+} from "@/lib/supabase-room-service";
 import type { HostAccount, SubscriptionPlan } from "@/lib/types";
 
 type PaidPlan = Exclude<SubscriptionPlan, "free">;
@@ -272,60 +277,96 @@ async function persistStripeSubscription(
   );
 }
 
+function getStripeEventErrorMessage(error: unknown) {
+  const message =
+    error instanceof Error ? error.message : "Stripe webhook の処理に失敗しました。";
+
+  return message.slice(0, 1000);
+}
+
 export async function handleStripeEvent(event: Stripe.Event) {
   assertStripeBillingConfigured();
 
-  const stripe = getStripeClient();
-  if (!stripe) {
-    throw new AppError("Stripe クライアントを初期化できません。", 500);
+  const admin = createAdminClient();
+  const shouldProcess = await claimStripeEventWithAdmin(
+    admin,
+    event.id,
+    event.type,
+  );
+
+  if (!shouldProcess) {
+    return { duplicate: true as const };
   }
 
-  switch (event.type) {
-    case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const subscriptionId =
-        typeof session.subscription === "string" ? session.subscription : null;
+  try {
+    const stripe = getStripeClient();
+    if (!stripe) {
+      throw new AppError("Stripe クライアントを初期化できません。", 500);
+    }
 
-      if (!subscriptionId) {
-        return;
+    switch (event.type) {
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const subscriptionId =
+          typeof session.subscription === "string" ? session.subscription : null;
+
+        if (!subscriptionId) {
+          break;
+        }
+
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        await persistStripeSubscription(
+          subscription,
+          session.metadata?.hostId ?? null,
+        );
+        break;
       }
-
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-      await persistStripeSubscription(
-        subscription,
-        session.metadata?.hostId ?? null,
-      );
-      break;
-    }
-    case "customer.subscription.created":
-    case "customer.subscription.updated": {
-      const subscription = event.data.object as Stripe.Subscription;
-      await persistStripeSubscription(subscription);
-      break;
-    }
-    case "customer.subscription.deleted": {
-      const subscription = event.data.object as Stripe.Subscription;
-      const admin = createAdminClient();
-      const hostId = await resolveHostIdFromStripeReferences({
-        hostId: subscription.metadata?.hostId ?? null,
-        stripeCustomerId:
-          typeof subscription.customer === "string" ? subscription.customer : null,
-        stripeSubscriptionId: subscription.id,
-      });
-
-      if (!hostId) {
-        return;
+      case "customer.subscription.created":
+      case "customer.subscription.updated": {
+        const subscription = event.data.object as Stripe.Subscription;
+        await persistStripeSubscription(subscription);
+        break;
       }
+      case "customer.subscription.deleted": {
+        const subscription = event.data.object as Stripe.Subscription;
+        const hostId = await resolveHostIdFromStripeReferences({
+          hostId: subscription.metadata?.hostId ?? null,
+          stripeCustomerId:
+            typeof subscription.customer === "string"
+              ? subscription.customer
+              : null,
+          stripeSubscriptionId: subscription.id,
+        });
 
-      await upsertHostSubscriptionWithAdmin(admin, hostId, "free", "inactive", 0, {
-        stripeCustomerId:
-          typeof subscription.customer === "string" ? subscription.customer : null,
-        stripeSubscriptionId: subscription.id,
-        stripeSubscriptionStatus: subscription.status,
-      });
-      break;
+        if (!hostId) {
+          break;
+        }
+
+        await upsertHostSubscriptionWithAdmin(
+          admin,
+          hostId,
+          "free",
+          "inactive",
+          0,
+          {
+            stripeCustomerId:
+              typeof subscription.customer === "string"
+                ? subscription.customer
+                : null,
+            stripeSubscriptionId: subscription.id,
+            stripeSubscriptionStatus: subscription.status,
+          },
+        );
+        break;
+      }
+      default:
+        break;
     }
-    default:
-      break;
+
+    await completeStripeEventWithAdmin(admin, event.id);
+    return { duplicate: false as const };
+  } catch (error) {
+    await failStripeEventWithAdmin(admin, event.id, getStripeEventErrorMessage(error));
+    throw error;
   }
 }

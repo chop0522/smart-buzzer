@@ -130,3 +130,36 @@ export async function upsertHostSubscriptionWithAdmin(
 
   return data;
 }
+
+export async function claimStripeEventWithAdmin(
+  supabase: SupabaseClient,
+  eventId: string,
+  eventType: string,
+  staleAfterSeconds = 300,
+) {
+  return rpc<boolean>(supabase, "claim_stripe_event", {
+    p_event_id: eventId,
+    p_event_type: eventType,
+    p_stale_after_seconds: staleAfterSeconds,
+  });
+}
+
+export async function completeStripeEventWithAdmin(
+  supabase: SupabaseClient,
+  eventId: string,
+) {
+  return rpc<null>(supabase, "complete_stripe_event", {
+    p_event_id: eventId,
+  });
+}
+
+export async function failStripeEventWithAdmin(
+  supabase: SupabaseClient,
+  eventId: string,
+  errorMessage: string,
+) {
+  return rpc<null>(supabase, "fail_stripe_event", {
+    p_event_id: eventId,
+    p_error: errorMessage,
+  });
+}
