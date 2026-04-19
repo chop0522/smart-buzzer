@@ -15,16 +15,17 @@
 | Field | Value |
 | --- | --- |
 | Workspace | `/Users/Yuya/smart-buzzer` |
-| Current HEAD | `409d262` |
+| Current HEAD | `59734a2` |
 | Production URL | `https://smart-buzzer.vercel.app` |
 | Production Alias State | `Ready` |
-| Current Production Commit | `409d26203522b8c807800b326c8d6a6d9aa49148` |
+| Current Production Commit | `59734a2a35c76802534c18c99e008697a62f6aae` |
 | Smoke Evidence | `docs/production-smoke-check.md` |
 
 補足:
 
 - smoke 実行時の証跡は `40955b8` ベースで記録されている
 - その後、production smoke 用 Playwright 整備を `409d262` として `main` に push 済み
+- dry-run plan と preview 証跡の docs 更新は `59734a2` として `main` に反映済み
 - cleanup 対象は deploy 差分ではなく、smoke で作成した test data
 
 ## Cleanup Targets
@@ -170,6 +171,49 @@ where stripe_customer_id = 'cus_UMKcorfOuzbtJD'
 
 - Supabase Dashboard の SQL Editor
 - または接続情報がある場合のみ `psql`
+
+## Read-Only Preview Result
+
+Checked at: `2026-04-19 16:59:26 JST`
+
+### Stripe test mode
+
+- customer: `cus_UMKcorfOuzbtJD`
+- livemode: `false`
+- email: `codex-smoke-1776529927960@example.com`
+- name: `CODEX SMOKE`
+- subscription: `sub_1TNbx4RYC6bzdq0l62huyK4A`
+- status: `active`
+- cancel_at_period_end: `false`
+- canceled_at: `null`
+- items:
+  - Starter: `price_1TNSMKRYC6bzdq0lpIe3F0ZL` quantity=`1`
+  - Extra Pack: `price_1TNSQuRYC6bzdq0lXJ8l61M0` quantity=`1`
+- invoice: `in_1TNbx1RYC6bzdq0l138EudzP` `¥1,560` `paid`
+
+### Supabase production DB
+
+| room_code | participants | rounds | buzz_events |
+| --- | --- | --- | --- |
+| `3BQBFG` | `4` | `2` | `2` |
+| `UMWLX7` | `12` | `1` | `0` |
+
+Subscription row preview:
+
+- host_user_id: `3759dab0-13a7-4a30-90c1-99ef9a9b7c85`
+- plan: `starter`
+- status: `active`
+- participant_limit: `12`
+- extra_pack_quantity: `1`
+- stripe_customer_id: `cus_UMKcorfOuzbtJD`
+- stripe_subscription_id: `sub_1TNbx4RYC6bzdq0l62huyK4A`
+- stripe_subscription_status: `active`
+
+Preview conclusion:
+
+- cleanup 対象は test mode / test data に限定されている
+- Stripe subscription 解約後に Supabase subscription row が free/inactive/limit 4 に戻るかを先に確認すべき
+- room 削除対象は `3BQBFG` と `UMWLX7` の 2 件で確定している
 
 ## Planned Cleanup Order After Approval
 
