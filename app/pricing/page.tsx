@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LegalLinks } from "@/components/legal/legal-links";
 import {
   EXTRA_PACK_INCREMENT,
   EXTRA_PACK_PRICE_LABEL,
@@ -169,6 +170,28 @@ export default function PricingPage() {
           >
             ホスト画面へ
           </Link>
+        </div>
+      </section>
+
+      <section className="rounded-[2rem] border border-amber-300/25 bg-amber-300/10 p-6 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.8)] backdrop-blur">
+        <p className="text-sm font-medium uppercase tracking-[0.24em] text-amber-100">
+          Checkout 前の確認
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold text-white">
+          月額課金と法務ページ
+        </h2>
+        <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-100">
+          <li>Starter は月額 980 円（税込）、Pro は月額 1,980 円（税込）です。</li>
+          <li>
+            Extra Pack は 1 個あたり月額 580 円（税込）で、1 個ごとに
+            {EXTRA_PACK_INCREMENT} 人分拡張されます。
+          </li>
+          <li>有料プランは月単位で自動更新されます。</li>
+          <li>解約はアカウント画面の請求管理から行えます。</li>
+          <li>支払済み料金の日割り返金は原則として行いません。</li>
+        </ul>
+        <div className="mt-5">
+          <LegalLinks />
         </div>
       </section>
     </div>

@@ -31,5 +31,23 @@ test.describe("production read-only smoke", () => {
     await expect(
       page.getByText("ホストだけログインして閲覧できます。参加者はゲスト参加です。"),
     ).toBeVisible();
+
+    await page.goto("/legal/tokushoho");
+    await expect(
+      page.getByRole("heading", { name: "特定商取引法に基づく表記" }),
+    ).toBeVisible();
+
+    await page.goto("/legal/terms");
+    await expect(page.getByRole("heading", { name: "利用規約" })).toBeVisible();
+
+    await page.goto("/legal/privacy");
+    await expect(
+      page.getByRole("heading", { name: "プライバシーポリシー" }),
+    ).toBeVisible();
+
+    await page.goto("/legal/cancellation");
+    await expect(
+      page.getByRole("heading", { name: "解約・返金ポリシー" }),
+    ).toBeVisible();
   });
 });

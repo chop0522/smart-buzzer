@@ -29,4 +29,27 @@ test("pricing page shows billing tiers", async ({ page }) => {
   await expect(page.getByText("Starter", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("Pro", { exact: true }).first()).toBeVisible();
   await expect(page.getByText(/Extra Pack/i).first()).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "特定商取引法に基づく表記" }).first(),
+  ).toBeVisible();
+});
+
+test("legal pages render", async ({ page }) => {
+  await page.goto("/legal/tokushoho");
+  await expect(
+    page.getByRole("heading", { name: "特定商取引法に基づく表記" }),
+  ).toBeVisible();
+
+  await page.goto("/legal/terms");
+  await expect(page.getByRole("heading", { name: "利用規約" })).toBeVisible();
+
+  await page.goto("/legal/privacy");
+  await expect(
+    page.getByRole("heading", { name: "プライバシーポリシー" }),
+  ).toBeVisible();
+
+  await page.goto("/legal/cancellation");
+  await expect(
+    page.getByRole("heading", { name: "解約・返金ポリシー" }),
+  ).toBeVisible();
 });

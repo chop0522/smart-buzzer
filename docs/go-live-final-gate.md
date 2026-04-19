@@ -23,21 +23,22 @@
 | Field | Value |
 | --- | --- |
 | Workspace | `/Users/Yuya/smart-buzzer` |
-| Current HEAD | `fe8f215` |
 | Current Branch | `main` |
-| Recommended Tag | `v0.1.4-go-live-checklist` |
+| Planning Tag | `v0.1.4-go-live-checklist` |
 | Production URL | `https://smart-buzzer.vercel.app` |
 | Production `/` | `HTTP/2 200` |
 | Production `/pricing` | `HTTP/2 200` |
 | Production `/account` | `HTTP/2 200` |
 | Cleanup Tag | `v0.1.3-production-cleanup-pass` |
 | Cleanup / Smoke / Go-live checklist | docs 記録済み |
+| Legal routes | `/legal/tokushoho`, `/legal/terms`, `/legal/privacy`, `/legal/cancellation` 実装済み |
+| Legal business info | 要設定項目あり |
 
 補足:
 
-- `origin/main` は `fe8f215` を指していることを確認済み
+- `origin/main` は確認時点の最新 `main` を指していることを都度確認する
 - `v0.1.3-production-cleanup-pass` は `139ec15` に付与済み
-- legal page らしき route は、2026-04-19 時点の repo grep では未検出
+- legal routes 自体は実装済みだが、事業者情報や問い合わせ先は未設定
 
 ## Usage
 
@@ -234,8 +235,9 @@ supabase db dump --linked --data-only -f supabase/data.live-pre-switch.sql
 
 2026-04-19 時点の repo 状況:
 
-- `legal|privacy|terms|commercial|tokushoho` の grep では該当 route 未検出
-- このため、現時点ではこの gate は `No` 寄りの扱い
+- legal routes は実装済み
+- ただし、事業者情報、問い合わせ先、管轄裁判所などの実データ差し替えは未完
+- このため、現時点では Legal / Disclosure gate はまだ `No` 寄りの扱い
 
 最低限、特商法ページで確認したい項目:
 

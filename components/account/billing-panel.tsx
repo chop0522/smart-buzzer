@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { LegalLinks } from "@/components/legal/legal-links";
 import { fetchJson } from "@/lib/fetch-json";
+import { formatYen } from "@/lib/format";
 import {
   EXTRA_PACK_INCREMENT,
+  EXTRA_PACK_PRICE_YEN,
   EXTRA_PACK_PRICE_LABEL,
   PLAN_CATALOG,
   PLAN_ORDER,
@@ -55,6 +58,9 @@ export function BillingPanel({
     account.plan !== "free" &&
     Boolean(account.stripeCustomerId && account.stripeSubscriptionId) &&
     account.status !== "canceled";
+  const selectedMonthlyTotal =
+    PLAN_CATALOG[selectedPlan].priceYen +
+    extraPackQuantity * EXTRA_PACK_PRICE_YEN;
 
   return (
     <div className="space-y-5">
@@ -195,6 +201,41 @@ export function BillingPanel({
                 +
               </button>
             </div>
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-[1.75rem] border border-amber-300/25 bg-amber-300/10 p-5">
+          <p className="text-sm font-medium uppercase tracking-[0.24em] text-amber-100">
+            Checkout 前の確認
+          </p>
+          <h3 className="mt-2 text-2xl font-semibold text-white">
+            料金・自動更新・解約方法
+          </h3>
+          <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-100">
+            <li>
+              選択中プラン: {formatPlanName(selectedPlan)} /{" "}
+              {PLAN_CATALOG[selectedPlan].priceLabel}
+            </li>
+            <li>参加者上限: {selectedLimit} 人</li>
+            <li>
+              Extra Pack: {extraPackQuantity} 件 / {EXTRA_PACK_PRICE_LABEL}
+            </li>
+            <li>
+              今回の月額合計目安: {formatYen(selectedMonthlyTotal)}（税込想定）
+            </li>
+            <li>契約は月単位で自動更新されます。</li>
+            <li>
+              解約はアカウント画面の請求管理からいつでも行えます。解約後も現在の請求期間の終了までは有料機能を利用できます。
+            </li>
+            <li>
+              支払済み料金の日割り返金は原則として行いません。誤課金やシステム不具合等で必要と判断した場合のみ個別に対応します。
+            </li>
+          </ul>
+          <p className="mt-4 text-sm leading-7 text-slate-100">
+            Stripe Checkout へ進むことで、利用規約、プライバシーポリシー、特定商取引法に基づく表記、解約・返金ポリシーを確認のうえ申込むものとします。
+          </p>
+          <div className="mt-4">
+            <LegalLinks />
           </div>
         </div>
 

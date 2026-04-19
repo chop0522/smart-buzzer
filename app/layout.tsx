@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Noto_Sans_JP, Space_Grotesk } from "next/font/google";
+import { LegalLinks } from "@/components/legal/legal-links";
 import "./globals.css";
 
 const notoSansJp = Noto_Sans_JP({
@@ -68,6 +69,19 @@ export default function RootLayout({
             <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-6 sm:px-6 lg:px-8">
               {children}
             </main>
+            <footer className="border-t border-white/10 bg-slate-950/55">
+              <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-6 sm:px-6 lg:px-8 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <p className="text-sm font-medium uppercase tracking-[0.24em] text-cyan-300">
+                    Legal
+                  </p>
+                  <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-300">
+                    料金、解約方法、返金方針、個人情報の取扱いは以下の法務ページから確認できます。
+                  </p>
+                </div>
+                <LegalLinks variant="footer" />
+              </div>
+            </footer>
           </div>
         </div>
       </body>
