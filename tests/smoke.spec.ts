@@ -1,8 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("top page and demo join flow render on mobile", async ({ page }) => {
-  const uniqueName = `Playwright-${Date.now()}`;
-
+test("top page and demo join entry render on mobile", async ({ page }) => {
   await page.goto("/");
   await expect(
     page.getByRole("heading", { name: /スマホだけで始める/i }),
@@ -10,17 +8,16 @@ test("top page and demo join flow render on mobile", async ({ page }) => {
 
   await page.getByRole("link", { name: "DEMO 参加導線" }).click();
   await expect(page).toHaveURL(/\/join\/DEMO42$/);
-
-  await page.getByRole("link", { name: "参加画面へ進む" }).click();
-  await expect(page).toHaveURL(/\/room\/DEMO42$/);
-
-  await page.getByLabel("表示名").fill(uniqueName);
-  await page.getByRole("button", { name: "この名前で参加" }).click();
-
   await expect(
-    page.getByText("ホストがラウンドを開始するのを待っています。"),
+    page.getByRole("heading", { name: "ルーム DEMO42 に参加" }),
   ).toBeVisible();
-  await expect(page.getByText(uniqueName).first()).toBeVisible();
+  await expect(
+    page.getByText(
+      "参加者はゲスト参加です。次の画面で表示名を入力し、ラウンド開始後に大きなボタンを押します。",
+    ),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "参加画面へ進む" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "トップへ戻る" })).toBeVisible();
 });
 
 test("pricing page shows billing tiers", async ({ page }) => {

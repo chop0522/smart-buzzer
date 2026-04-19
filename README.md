@@ -138,6 +138,15 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
+production に対する read-only smoke test は次で実行できます。
+
+```bash
+npm run test:e2e:production
+```
+
+- 対象は `https://smart-buzzer.vercel.app` の `GET /`, `GET /pricing`, 未ログイン `GET /account` です
+- production 全体の確認項目は [`docs/production-smoke-check.md`](docs/production-smoke-check.md) を使って記録してください
+
 ## 課金まわり
 
 - `POST /api/billing/checkout` で Starter / Pro + Extra Pack quantity の Checkout Session を作成

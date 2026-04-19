@@ -1,21 +1,30 @@
 const defaultAppUrl = "http://127.0.0.1:3000";
+const forceFallbackMode = process.env.PLAYWRIGHT_FALLBACK_MODE === "1";
+
+function getEnvValue(name: keyof NodeJS.ProcessEnv) {
+  if (forceFallbackMode) {
+    return "";
+  }
+
+  return process.env[name] ?? "";
+}
 
 export const publicEnv = {
   appUrl: process.env.NEXT_PUBLIC_APP_URL ?? defaultAppUrl,
-  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
-  supabasePublishableKey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "",
+  supabaseUrl: getEnvValue("NEXT_PUBLIC_SUPABASE_URL"),
+  supabasePublishableKey: getEnvValue("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"),
 };
 
 export const serverEnv = {
   sessionCookieName: process.env.SESSION_COOKIE_NAME ?? "smart_buzzer_host",
   hostDemoPassword: process.env.HOST_DEMO_PASSWORD ?? "",
   hostSessionSecret: process.env.HOST_SESSION_SECRET ?? "",
-  stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? "",
-  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
-  stripePriceStarterMonthly: process.env.STRIPE_PRICE_STARTER_MONTHLY ?? "",
-  stripePriceProMonthly: process.env.STRIPE_PRICE_PRO_MONTHLY ?? "",
-  stripePriceExtraPackMonthly: process.env.STRIPE_PRICE_EXTRA_PACK_MONTHLY ?? "",
-  supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+  stripeSecretKey: getEnvValue("STRIPE_SECRET_KEY"),
+  stripeWebhookSecret: getEnvValue("STRIPE_WEBHOOK_SECRET"),
+  stripePriceStarterMonthly: getEnvValue("STRIPE_PRICE_STARTER_MONTHLY"),
+  stripePriceProMonthly: getEnvValue("STRIPE_PRICE_PRO_MONTHLY"),
+  stripePriceExtraPackMonthly: getEnvValue("STRIPE_PRICE_EXTRA_PACK_MONTHLY"),
+  supabaseServiceRoleKey: getEnvValue("SUPABASE_SERVICE_ROLE_KEY"),
 };
 
 export function isRealtimeConfigured() {
