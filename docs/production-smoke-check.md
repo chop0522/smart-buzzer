@@ -221,6 +221,8 @@ npm run test:e2e:production
 ## Cleanup
 
 - dry-run 計画は [`docs/cleanup-dry-run-plan.md`](./cleanup-dry-run-plan.md) を参照
-- 不要な test ルームは削除またはリセットする
-- Stripe test checkout を実施した場合は Dashboard の event / customer をメモしておく
-- 実施結果はこのファイルの Summary を更新して残す
+- Cleanup 実行結果:
+  - `2026-04-19 17:35:51 JST` に Stripe test subscription `sub_1TNbx4RYC6bzdq0l62huyK4A` を cancel
+  - webhook 反映後、Supabase `subscriptions` row は `free / inactive / participant_limit=4 / extra_pack_quantity=0 / stripe_subscription_status=canceled` へ復帰
+  - smoke 用 room `3BQBFG` と `UMWLX7` を削除し、関連 `participants` / `rounds` / `buzz_events` の cascade cleanup も確認
+  - Stripe customer `cus_UMKcorfOuzbtJD` と invoice `in_1TNbx1RYC6bzdq0l138EudzP` は証跡保持のため未削除

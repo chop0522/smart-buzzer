@@ -215,6 +215,67 @@ Preview conclusion:
 - Stripe subscription 解約後に Supabase subscription row が free/inactive/limit 4 に戻るかを先に確認すべき
 - room 削除対象は `3BQBFG` と `UMWLX7` の 2 件で確定している
 
+## Cleanup Execution Result
+
+Executed at: `2026-04-19 17:35:51 JST`
+
+### Stripe execution
+
+- subscription `sub_1TNbx4RYC6bzdq0l62huyK4A` を即時 cancel 済み
+- Stripe subscription status: `canceled`
+- `cancel_at_period_end`: `false`
+- `canceled_at`: `1776587715`
+- customer `cus_UMKcorfOuzbtJD` は保持
+- customer livemode: `false`
+
+### Webhook / Supabase reflection
+
+Webhook 反映後の `subscriptions` row:
+
+- host_user_id: `3759dab0-13a7-4a30-90c1-99ef9a9b7c85`
+- plan: `free`
+- status: `inactive`
+- participant_limit: `4`
+- extra_pack_quantity: `0`
+- stripe_customer_id: `cus_UMKcorfOuzbtJD`
+- stripe_subscription_id: `sub_1TNbx4RYC6bzdq0l62huyK4A`
+- stripe_subscription_status: `canceled`
+- updated_at: `2026-04-19T08:35:17.319979+00:00`
+
+確認結果:
+
+- webhook は正常反映
+- participant limit は `12` から `4` に復帰
+- subscription row は cleanup 後の期待状態に一致
+
+### Room cleanup
+
+削除済み room:
+
+- `3BQBFG`
+- `UMWLX7`
+
+削除後確認:
+
+- `public.rooms` に対象 room の残存なし
+- cascade 結果:
+  - room `3BQBFG`: participants=`0`, rounds=`0`, buzz_events=`0`
+  - room `UMWLX7`: participants=`0`, rounds=`0`, buzz_events=`0`
+
+### Remaining items
+
+今回は次を未実施のまま保持:
+
+- temporary host / profile / Supabase Auth user
+- Stripe customer `cus_UMKcorfOuzbtJD`
+- paid invoice `in_1TNbx1RYC6bzdq0l138EudzP`
+
+Execution conclusion:
+
+- cleanup の主目的だった subscription と smoke room 2件の片付けは完了
+- 課金状態は free 側へ復帰済み
+- 追加の account/customer 削除は別判断に分離できる状態
+
 ## Planned Cleanup Order After Approval
 
 実 cleanup はユーザー承認後に、次の順で進める。
