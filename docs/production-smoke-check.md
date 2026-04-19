@@ -220,6 +220,7 @@ npm run test:e2e:production
 
 ## Cleanup
 
+- dry-run 計画は [`docs/cleanup-dry-run-plan.md`](./cleanup-dry-run-plan.md) を参照
 - 不要な test ルームは削除またはリセットする
 - Stripe test checkout を実施した場合は Dashboard の event / customer をメモしておく
 - 実施結果はこのファイルの Summary を更新して残す
