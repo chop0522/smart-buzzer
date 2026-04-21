@@ -80,7 +80,7 @@ export default function Home() {
           },
           {
             title: "/account",
-            copy: "契約状況と参加上限の確認。Stripe 未設定時はローカル模擬切り替えに対応。",
+            copy: "契約状況と参加上限の確認。開発環境ではローカル模擬切り替えに対応。",
           },
         ].map((item) => (
           <article

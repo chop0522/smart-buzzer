@@ -12,7 +12,7 @@ export default function PrivacyPage() {
     <LegalPageShell
       eyebrow="Legal"
       title="プライバシーポリシー"
-      description="本サービスで取得する情報、利用目的、外部サービス利用、問い合わせ窓口を記載しています。live 前に問い合わせ先等を実データへ差し替えてください。"
+      description="本サービスで取得する情報、利用目的、外部サービス利用、問い合わせ窓口を記載しています。"
     >
       <section className="grid gap-5 lg:grid-cols-2">
         <article className="rounded-[2rem] border border-white/15 bg-slate-950/70 p-6 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.8)] backdrop-blur">

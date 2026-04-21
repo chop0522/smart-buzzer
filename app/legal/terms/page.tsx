@@ -51,7 +51,7 @@ export default function TermsPage() {
     <LegalPageShell
       eyebrow="Legal"
       title="利用規約"
-      description="本サービスの利用条件を定めています。実公開前に、運営主体や裁判管轄などの未設定情報を実データへ差し替えてください。"
+      description="本サービスの利用条件を定めています。"
     >
       <section className="space-y-4">
         {sections.map((section) => (

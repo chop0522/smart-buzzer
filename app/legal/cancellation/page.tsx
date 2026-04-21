@@ -1,4 +1,4 @@
-import { LEGAL_PAYMENT_SUMMARY } from "@/lib/legal";
+import { LEGAL_PAYMENT_SUMMARY, LEGAL_REFUND_POLICY } from "@/lib/legal";
 import { LegalPageShell } from "@/components/legal/legal-page-shell";
 
 const cancellationPoints = [
@@ -6,8 +6,7 @@ const cancellationPoints = [
   "解約はアカウント画面の請求管理からいつでも行えます。",
   "解約後も、現在の請求期間の終了までは有料機能を利用できます。",
   "次回更新日以降は無料プランへ戻ります。",
-  "支払済み料金の日割り返金は原則として行いません。",
-  "誤課金、二重課金、システム不具合等で必要と判断した場合のみ個別に返金対応を行うことがあります。",
+  LEGAL_REFUND_POLICY,
 ] as const;
 
 export default function CancellationPage() {
@@ -15,7 +14,7 @@ export default function CancellationPage() {
     <LegalPageShell
       eyebrow="Legal"
       title="解約・返金ポリシー"
-      description="月額課金の更新、解約、返金に関する基本方針です。実運用に合わせて、返金条件やサポート窓口を最終確認してください。"
+      description="月額課金の更新、解約、返金に関する基本方針です。"
     >
       <section className="grid gap-5 lg:grid-cols-2">
         <article className="rounded-[2rem] border border-white/15 bg-slate-950/70 p-6 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.8)] backdrop-blur">

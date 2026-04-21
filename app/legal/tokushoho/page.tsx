@@ -2,6 +2,7 @@ import {
   LEGAL_BUSINESS_INFO,
   LEGAL_ENVIRONMENT_NOTES,
   LEGAL_PAYMENT_SUMMARY,
+  LEGAL_REFUND_POLICY,
   LEGAL_SERVICE_NAME,
   getLegalValue,
 } from "@/lib/legal";
@@ -54,8 +55,7 @@ const fieldRows = [
   },
   {
     label: "返金について",
-    value:
-      "支払済み料金の日割り返金は原則として行いません。誤課金やシステム不具合など、当方が必要と判断した場合のみ個別に対応します。",
+    value: LEGAL_REFUND_POLICY,
   },
   {
     label: "管轄裁判所",
@@ -68,7 +68,7 @@ export default function TokushohoPage() {
     <LegalPageShell
       eyebrow="Legal"
       title="特定商取引法に基づく表記"
-      description="通信販売に関する表示事項をまとめています。live 課金開始前に、事業者情報と問い合わせ先を実データへ差し替えてください。"
+      description="通信販売に関する表示事項をまとめています。"
     >
       <section className="overflow-hidden rounded-[2rem] border border-white/15 bg-slate-950/70 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.8)] backdrop-blur">
         <div className="border-b border-white/10 px-6 py-5">

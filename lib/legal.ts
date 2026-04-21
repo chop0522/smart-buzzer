@@ -1,6 +1,6 @@
 import { EXTRA_PACK_INCREMENT, EXTRA_PACK_PRICE_LABEL, PLAN_CATALOG } from "@/lib/plans";
 
-export const LEGAL_LAST_UPDATED = "2026-04-19";
+export const LEGAL_LAST_UPDATED = "2026-04-21";
 export const LEGAL_SERVICE_NAME = "Smart Buzzer";
 
 export const LEGAL_LINKS = [
@@ -23,13 +23,13 @@ export const LEGAL_LINKS = [
 ] as const;
 
 export const LEGAL_BUSINESS_INFO = {
-  sellerName: "",
-  operatorName: "",
-  address: "",
-  phone: "",
-  email: "",
-  businessHours: "",
-  governingCourt: "",
+  sellerName: "Yuya Tanaka",
+  operatorName: "Yuya Tanaka",
+  address: "千葉県市川市湊新田2−1−18 ビアメゾンロジェール１０１",
+  phone: "090-4051-7011",
+  email: "smartbuzzer.support@gmail.com",
+  businessHours: "11:00-20:00",
+  governingCourt: "千葉地方裁判所又は千葉簡易裁判所",
 } as const;
 
 export const LEGAL_REQUIRED_FIELDS = [
@@ -61,7 +61,10 @@ export function getMissingLegalFields() {
 }
 
 export const LEGAL_WARNING_TEXT =
-  "live 前に実在の事業者情報・問い合わせ先・返金方針へ差し替えてください。仮の値や未設定値のまま公開しないでください。";
+  "live 前に実在の事業者情報・問い合わせ先・返金方針へ差し替えてください。仮の値や空欄のまま公開しないでください。";
+
+export const LEGAL_REFUND_POLICY =
+  "支払済み料金については、サービスの性質上、原則として日割り返金を行いません。ただし、誤課金、二重課金、当サービスの重大な不具合、その他当方が必要と判断した場合には、個別に返金対応を行うことがあります。";
 
 export const LEGAL_PAYMENT_SUMMARY = [
   `Starter は ${PLAN_CATALOG.starter.priceLabel}、Pro は ${PLAN_CATALOG.pro.priceLabel} です。`,
@@ -69,7 +72,7 @@ export const LEGAL_PAYMENT_SUMMARY = [
   "有料プランは月単位で自動更新されます。",
   "お支払いは Stripe Checkout を通じて処理されます。",
   "解約はアカウント画面の請求管理から行えます。",
-  "支払済み料金の日割り返金は原則として行いません。必要がある場合のみ個別に対応します。",
+  LEGAL_REFUND_POLICY,
 ] as const;
 
 export const LEGAL_PRIVACY_DATA_POINTS = [

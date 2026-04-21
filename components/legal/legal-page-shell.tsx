@@ -32,9 +32,7 @@ export function LegalPageShell({
           <div className="mt-5 rounded-[1.5rem] border border-amber-300/30 bg-amber-300/10 p-4 text-sm leading-7 text-amber-50">
             <p className="font-semibold">公開前に差し替えが必要な項目があります。</p>
             <p className="mt-2">{LEGAL_WARNING_TEXT}</p>
-            <p className="mt-2">
-              未設定: {missingFields.map((item) => item.label).join(" / ")}
-            </p>
+            <p className="mt-2">不足項目: {missingFields.map((item) => item.label).join(" / ")}</p>
           </div>
         ) : null}
       </section>
