@@ -1,6 +1,6 @@
 # Go-Live Final Gate
 
-`2026-04-19` 時点の live 切り替え直前用 Yes / No ゲートです。\
+`2026-04-22` 時点の live 切り替え直前用 Yes / No ゲートです。\
 このドキュメントは **live mode へ実際に切り替える前の最終停止線** として使います。
 
 ## Purpose
@@ -24,6 +24,7 @@
 | --- | --- |
 | Workspace | `/Users/Yuya/smart-buzzer` |
 | Current Branch | `main` |
+| Current Commit | `f5252b9` |
 | Planning Tag | `v0.1.4-go-live-checklist` |
 | Production URL | `https://smart-buzzer.vercel.app` |
 | Production `/` | `HTTP/2 200` |
@@ -32,13 +33,15 @@
 | Cleanup Tag | `v0.1.3-production-cleanup-pass` |
 | Cleanup / Smoke / Go-live checklist | docs 記録済み |
 | Legal routes | `/legal/tokushoho`, `/legal/terms`, `/legal/privacy`, `/legal/cancellation` 実装済み |
-| Legal business info | 要設定項目あり |
+| Legal business info | 実データ反映済み |
 
 補足:
 
 - `origin/main` は確認時点の最新 `main` を指していることを都度確認する
 - `v0.1.3-production-cleanup-pass` は `139ec15` に付与済み
-- legal routes 自体は実装済みだが、事業者情報や問い合わせ先は未設定
+- `f5252b9 chore: fill legal business information` は `origin/main` へ push 済み
+- production で `/legal/tokushoho` と `/legal/privacy` に実データ反映を確認済み
+- production `/account` は `200` を確認済み
 
 ## Usage
 
@@ -233,11 +236,12 @@ supabase db dump --linked --data-only -f supabase/data.live-pre-switch.sql
 /commercial-transactions
 ```
 
-2026-04-19 時点の repo 状況:
+2026-04-22 時点の repo 状況:
 
 - legal routes は実装済み
-- ただし、事業者情報、問い合わせ先、管轄裁判所などの実データ差し替えは未完
-- このため、現時点では Legal / Disclosure gate はまだ `No` 寄りの扱い
+- 事業者情報、問い合わせ先、管轄裁判所、返金方針の実データ差し替えは完了
+- production でも `/legal/tokushoho` と `/legal/privacy` の反映を確認済み
+- このため Legal / Disclosure gate は、placeholder の有無ではなく内容妥当性で判断する段階に入っている
 
 最低限、特商法ページで確認したい項目:
 
