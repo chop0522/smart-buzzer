@@ -18,11 +18,11 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: {
-    default: "Smart Buzzer MVP",
-    template: "%s | Smart Buzzer MVP",
+    default: "Smart Buzzer",
+    template: "%s | Smart Buzzer",
   },
   description:
-    "スマホブラウザ向け早押し Web アプリの MVP。Next.js App Router / Supabase Realtime Broadcast / Stripe webhook 検証を前提にした構成。",
+    "Smart Buzzer は、クイズやイベント向けにホストが早押しルームを作成し、参加者がスマートフォンから参加できるサブスクリプション型Webアプリです。",
 };
 
 export default function RootLayout({
@@ -50,10 +50,9 @@ export default function RootLayout({
                 </Link>
                 <nav className="flex flex-wrap items-center gap-2 text-sm">
                   {[
-                    ["/host", "Host"],
                     ["/join/DEMO42", "Join"],
                     ["/pricing", "Pricing"],
-                    ["/account", "Account"],
+                    ["/legal/tokushoho", "Legal"],
                   ].map(([href, label]) => (
                     <Link
                       key={href}

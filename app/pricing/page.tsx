@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LegalLinks } from "@/components/legal/legal-links";
+import { LEGAL_BUSINESS_INFO } from "@/lib/legal";
 import {
   EXTRA_PACK_INCREMENT,
   EXTRA_PACK_PRICE_LABEL,
@@ -151,24 +152,24 @@ export default function PricingPage() {
       <section className="rounded-[2rem] border border-white/15 bg-slate-950/70 p-6 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.8)] backdrop-blur">
         <h2 className="text-2xl font-semibold text-white">Billing フロー</h2>
         <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-300">
-          <li>Starter / Pro / Extra Pack quantity を Checkout Session の `line_items` で作成します。</li>
-          <li>Customer Portal ではプラン変更、支払い方法更新、解約導線を開けます。</li>
-          <li>Webhook では署名検証後に `subscriptions` テーブルへ契約状態を保存します。</li>
-          <li>ルーム作成時と participant 参加時はサーバー側で人数上限を再計算して検証します。</li>
+          <li>Starter / Pro / Extra Pack は月額サブスクリプションです。</li>
+          <li>決済は Stripe Checkout を通じてクレジットカードで処理されます。</li>
+          <li>契約後は請求管理画面からプラン変更、支払い方法更新、解約を行えます。</li>
+          <li>ルーム作成時と参加時はサーバー側で人数上限を検証します。</li>
         </ul>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <Link
-            href="/account"
+            href="/legal/tokushoho"
             className="rounded-2xl bg-cyan-300 px-4 py-4 text-center text-base font-semibold text-slate-950 transition hover:bg-cyan-200"
           >
-            契約状況ページへ
+            事業者情報を見る
           </Link>
           <Link
-            href="/host"
+            href="/legal/cancellation"
             className="rounded-2xl border border-white/15 px-4 py-4 text-center text-base font-semibold text-slate-100 transition hover:bg-white/5"
           >
-            ホスト画面へ
+            解約・返金ポリシー
           </Link>
         </div>
       </section>
@@ -193,6 +194,18 @@ export default function PricingPage() {
         <div className="mt-5">
           <LegalLinks />
         </div>
+      </section>
+
+      <section className="rounded-[2rem] border border-white/15 bg-slate-950/70 p-6 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.8)] backdrop-blur">
+        <p className="text-sm font-medium uppercase tracking-[0.24em] text-cyan-300">
+          Support
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold text-white">お問い合わせ</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">
+          料金、契約、解約、返金、請求に関する問い合わせは
+          {LEGAL_BUSINESS_INFO.email} までご連絡ください。
+          受付時間は {LEGAL_BUSINESS_INFO.businessHours} です。
+        </p>
       </section>
     </div>
   );
