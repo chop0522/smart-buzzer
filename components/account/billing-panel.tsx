@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { LegalLinks } from "@/components/legal/legal-links";
 import { fetchJson } from "@/lib/fetch-json";
@@ -65,13 +66,38 @@ export function BillingPanel({
   return (
     <div className="space-y-5">
       <section className="rounded-[2rem] border border-white/15 bg-slate-950/70 p-6 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.8)] backdrop-blur">
-        <p className="text-sm font-medium uppercase tracking-[0.24em] text-cyan-300">
-          Billing
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold text-white">契約状況</h1>
-        <p className="mt-3 text-sm leading-7 text-slate-300">
-          Free は 4 人、Starter は 8 人、Pro は 16 人までです。Extra Pack を 1 つ追加するごとに +4 人され、上限判定は room 作成時と参加時の両方でサーバー側が検証します。
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-medium uppercase tracking-[0.24em] text-cyan-300">
+              Billing
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold text-white">契約状況</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">
+              Free は 4 人、Starter は 8 人、Pro は 16 人までです。Extra Pack を 1 つ追加するごとに +4 人され、上限判定は room 作成時と参加時の両方でサーバー側が検証します。
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/host"
+              className="rounded-2xl border border-white/15 px-4 py-2 text-sm text-slate-100 transition hover:bg-white/5"
+            >
+              ホスト画面へ
+            </Link>
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() =>
+                run(async () => {
+                  await fetchJson("/api/auth/host-logout", { method: "POST" });
+                  window.location.href = "/host";
+                })
+              }
+              className="rounded-2xl border border-white/15 px-4 py-2 text-sm text-slate-100 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              ログアウト
+            </button>
+          </div>
+        </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-4">
           <article className="rounded-3xl border border-white/10 bg-white/5 p-4">
