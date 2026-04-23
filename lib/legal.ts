@@ -1,6 +1,6 @@
 import { EXTRA_PACK_INCREMENT, EXTRA_PACK_PRICE_LABEL, PLAN_CATALOG } from "@/lib/plans";
 
-export const LEGAL_LAST_UPDATED = "2026-04-21";
+export const LEGAL_LAST_UPDATED = "2026-04-23";
 export const LEGAL_SERVICE_NAME = "Smart Buzzer";
 
 export const LEGAL_LINKS = [
@@ -23,8 +23,8 @@ export const LEGAL_LINKS = [
 ] as const;
 
 export const LEGAL_BUSINESS_INFO = {
-  sellerName: "Yuya Tanaka",
-  operatorName: "Yuya Tanaka",
+  sellerName: "田中裕也",
+  operatorName: "田中裕也",
   address: "千葉県市川市湊新田2−1−18 ビアメゾンロジェール１０１",
   phone: "090-4051-7011",
   email: "smartbuzzer.support@gmail.com",
