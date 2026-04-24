@@ -3,10 +3,11 @@ import { expect, test } from "@playwright/test";
 test("top page and demo join entry render on mobile", async ({ page }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: /スマホだけで始める/i }),
+    page.getByRole("heading", { name: /早押しルームを作って/i }),
   ).toBeVisible();
+  await expect(page.getByRole("link", { name: "無料でホスト登録" })).toBeVisible();
 
-  await page.getByRole("link", { name: "DEMO 参加導線" }).click();
+  await page.getByRole("link", { name: "参加デモ" }).click();
   await expect(page).toHaveURL(/\/join\/DEMO42$/);
   await expect(
     page.getByRole("heading", { name: "ルーム DEMO42 に参加" }),

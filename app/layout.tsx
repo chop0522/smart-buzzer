@@ -50,6 +50,7 @@ export default function RootLayout({
                 </Link>
                 <nav className="flex flex-wrap items-center gap-2 text-sm">
                   {[
+                    ["/host", "Host"],
                     ["/join/DEMO42", "Join"],
                     ["/pricing", "Pricing"],
                     ["/legal/tokushoho", "Legal"],

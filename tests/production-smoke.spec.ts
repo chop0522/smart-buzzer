@@ -11,9 +11,9 @@ test.describe("production read-only smoke", () => {
   test("public pages render and admin pages require Basic auth", async ({ page }) => {
     await page.goto("/");
     await expect(
-      page.getByRole("heading", { name: /スマホだけで始める/i }),
+      page.getByRole("heading", { name: /早押しルームを作って/i }),
     ).toBeVisible();
-    await expect(page.getByRole("link", { name: "料金ページ" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "無料でホスト登録" })).toBeVisible();
 
     await page.goto("/pricing");
     await expect(
