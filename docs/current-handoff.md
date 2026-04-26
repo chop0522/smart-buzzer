@@ -1,6 +1,6 @@
 # Current Handoff
 
-Last updated: 2026-04-26 16:48 JST
+Last updated: 2026-04-26 17:09 JST
 
 This file is the short status handoff for ChatGPT Pro or the next operator.
 Do not paste secret values into this file.
@@ -10,7 +10,7 @@ Do not paste secret values into this file.
 - Project: Smart Buzzer
 - Workspace: `/Users/Yuya/smart-buzzer`
 - Branch: `main`
-- Current stable docs commit: `e4de3d5 docs: add current handoff`
+- Current stable docs commit: `def832a docs: refresh current handoff`
 - Current live-ready tag: `v0.1.6-live-env-ready`
 - Tag target: `e4de3d5 docs: add current handoff`
 - Production URL: `https://smart-buzzer.vercel.app`
@@ -50,6 +50,31 @@ Do not paste secret values into this file.
   - `/legal/cancellation`: `200`
   - `/account`: `401` unauthenticated due to Basic Auth; not `500`
 
+## 2026-04-26 17:09 JST Progress
+
+- Git status/log/diff were checked before doing further work.
+- `docs/current-handoff.md` and `docs/go-live-final-gate.md` had no uncommitted diff at the start of this step.
+- Local `main` had one docs-only commit ahead of `origin/main`: `def832a docs: refresh current handoff`.
+- `git push origin main` and HTTPS push both failed from this process due to GitHub authentication not being available to the agent process.
+- Vercel Production was inspected again and remained `Ready`.
+- Public smoke was repeated:
+  - `/`: `200`
+  - `/pricing`: `200`
+  - `/legal/tokushoho`: `200`
+  - `/legal/privacy`: `200`
+  - `/legal/terms`: `200`
+  - `/legal/cancellation`: `200`
+  - `/account`: `401` unauthenticated due to Basic Auth; not `500`
+- Vercel env target check:
+  - Production has Stripe env names present
+  - Preview env count: `0`
+  - Development env count: `0`
+- Authenticated `/account` smoke was not completed because Vercel sensitive env pull returned empty values for `ADMIN_BASIC_AUTH_USER` / `ADMIN_BASIC_AUTH_PASSWORD`.
+- Host login credentials were not available to the agent process.
+- Live Checkout from authenticated `/account` was not opened in this step.
+- No real-card payment was attempted.
+- No cleanup, deletion, refund, cancellation, or Preview/Development live key operation was performed.
+
 ## Important Constraints
 
 - Do not run cleanup unless the user explicitly asks.
@@ -64,12 +89,14 @@ Do not paste secret values into this file.
 - Commit `1c3b73c` records the live env readiness checks in `docs/go-live-final-gate.md`.
 - Commit `e4de3d5` adds this dedicated handoff file.
 - Tag `v0.1.6-live-env-ready` points at `e4de3d5`.
-- This handoff refresh is docs-only and should be committed separately.
+- Commit `def832a` refreshes this handoff after tag confirmation.
+- This handoff refresh should be committed and pushed as docs-only.
 - The worktree still has unrelated modified and untracked app/security files from earlier work.
 - Only docs files should be staged for handoff/status commits unless the user explicitly asks for app changes.
 
 ## Remaining Work
 
+- Push docs-only handoff refresh commit(s) to GitHub from an authenticated user terminal if the agent process cannot authenticate.
 - Authenticated `/account` smoke can be done later if Basic Auth / host login credentials are available.
 - First live charge is still not done and should remain behind a final user confirmation gate.
 - After the first live charge, verify `/account?checkout=success`, Supabase subscription row, and Stripe webhook delivery.
