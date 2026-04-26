@@ -14,24 +14,46 @@ export async function POST(request: Request) {
     displayName?: string;
     password?: string;
     demo?: boolean;
-    intent?: "sign-in" | "sign-up";
+    intent?: "sign-in" | "sign-up" | "reset-password";
   };
 
   if (isSupabaseConfigured()) {
     const supabase = await createClient();
+    const email = body.email?.trim().toLowerCase() ?? "";
 
-    if (!body.email || !body.password) {
+    if (!email) {
+      return jsonError("メールアドレスを入力してください。");
+    }
+
+    if (body.intent === "reset-password") {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: new URL(
+          "/auth/callback?next=/auth/reset-password",
+          publicEnv.appUrl,
+        ).toString(),
+      });
+
+      if (error) {
+        return jsonError(error.message, 400);
+      }
+
+      return jsonOk({
+        passwordResetEmailSent: true,
+      });
+    }
+
+    if (!body.password) {
       return jsonError("メールアドレスとパスワードを入力してください。");
     }
 
     if (body.intent === "sign-up") {
       const { data, error } = await supabase.auth.signUp({
-        email: body.email,
+        email,
         password: body.password,
         options: {
           emailRedirectTo: new URL("/auth/callback", publicEnv.appUrl).toString(),
           data: {
-            display_name: body.displayName?.trim() || body.email.split("@")[0],
+            display_name: body.displayName?.trim() || email.split("@")[0],
           },
         },
       });
@@ -47,7 +69,7 @@ export async function POST(request: Request) {
     }
 
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: body.email,
+      email,
       password: body.password,
     });
 

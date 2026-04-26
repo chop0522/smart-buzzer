@@ -6,7 +6,11 @@ import { fetchJson } from "@/lib/fetch-json";
 const authModes = [
   { value: "sign-in", label: "ログイン" },
   { value: "sign-up", label: "無料登録" },
+  { value: "reset-password", label: "再設定" },
 ] as const;
+
+type AuthMode = (typeof authModes)[number]["value"];
+type MessageTone = "info" | "error";
 
 export function HostLoginCard({
   demoAvailable,
@@ -15,11 +19,12 @@ export function HostLoginCard({
   demoAvailable: boolean;
   useSupabaseAuth?: boolean;
 }) {
-  const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
+  const [mode, setMode] = useState<AuthMode>("sign-in");
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const [messageTone, setMessageTone] = useState<MessageTone>("info");
   const [isPending, startTransition] = useTransition();
 
   const login = (
@@ -28,20 +33,30 @@ export function HostLoginCard({
       password?: string;
       displayName?: string;
       demo?: boolean;
-      intent?: "sign-in" | "sign-up";
+      intent?: AuthMode;
     },
     successMessage?: string,
   ) => {
     startTransition(async () => {
       try {
         const response = await fetchJson<{
+          passwordResetEmailSent?: boolean;
           requiresEmailConfirmation?: boolean;
         }>("/api/auth/host-login", {
           method: "POST",
           body: JSON.stringify(payload),
         });
 
+        if (response.passwordResetEmailSent) {
+          setMessageTone("info");
+          setMessage(
+            "パスワード再設定メールを送信しました。登録済みメールアドレスの場合は、届いたリンクから新しいパスワードを設定してください。",
+          );
+          return;
+        }
+
         if (response.requiresEmailConfirmation) {
+          setMessageTone("info");
           setMessage(
             successMessage ??
               "確認メールを送信しました。メールを確認してからログインしてください。",
@@ -51,16 +66,18 @@ export function HostLoginCard({
 
         window.location.reload();
       } catch (error) {
+        setMessageTone("error");
         setMessage(error instanceof Error ? error.message : "ログインに失敗しました。");
       }
     });
   };
 
   const isSignUp = useSupabaseAuth && mode === "sign-up";
+  const isPasswordReset = useSupabaseAuth && mode === "reset-password";
   const isPrimaryDisabled =
     isPending ||
-    password.trim().length === 0 ||
     (useSupabaseAuth && email.trim().length === 0) ||
+    (!isPasswordReset && password.trim().length === 0) ||
     (isSignUp && password.trim().length < 6);
 
   return (
@@ -70,17 +87,23 @@ export function HostLoginCard({
           Host
         </p>
         <h1 className="text-3xl font-semibold text-white">
-          {isSignUp ? "無料でホスト登録" : "ホストログイン"}
+          {isPasswordReset
+            ? "パスワード再設定"
+            : isSignUp
+              ? "無料でホスト登録"
+              : "ホストログイン"}
         </h1>
         <p className="text-sm leading-7 text-slate-300">
-          {useSupabaseAuth
+          {isPasswordReset
+            ? "登録済みメールアドレスに再設定リンクを送ります。届いたメールから新しいパスワードを設定してください。"
+            : useSupabaseAuth
             ? "ホストはメールアドレスで管理画面に入ります。参加者は登録不要のゲスト参加です。"
             : "参加者はゲスト参加です。ホストはサーバー側で検証されるセッションを取得してから、ルーム作成とラウンド操作を行います。"}
         </p>
       </div>
 
       {useSupabaseAuth ? (
-        <div className="grid grid-cols-2 rounded-2xl border border-white/10 bg-white/5 p-1">
+        <div className="grid grid-cols-3 rounded-2xl border border-white/10 bg-white/5 p-1">
           {authModes.map(({ value, label }) => (
             <button
               key={value}
@@ -88,6 +111,7 @@ export function HostLoginCard({
               onClick={() => {
                 setMode(value);
                 setMessage(null);
+                setMessageTone("info");
               }}
               className={`rounded-xl px-3 py-2 text-sm font-semibold transition ${
                 mode === value
@@ -125,19 +149,25 @@ export function HostLoginCard({
               />
             </label>
           ) : null}
-          <label className="space-y-2">
-            <span className="text-sm text-slate-200">パスワード</span>
-            <input
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              type="password"
-              placeholder="6文字以上"
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white outline-none transition focus:border-cyan-300 focus:bg-white/10"
-            />
-          </label>
+          {!isPasswordReset ? (
+            <label className="space-y-2">
+              <span className="text-sm text-slate-200">パスワード</span>
+              <input
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                type="password"
+                placeholder="6文字以上"
+                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white outline-none transition focus:border-cyan-300 focus:bg-white/10"
+              />
+            </label>
+          ) : null}
           {isSignUp ? (
             <p className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 px-4 py-3 text-sm leading-6 text-cyan-50">
               登録直後は Free プランです。4人までのルームを作成できます。
+            </p>
+          ) : isPasswordReset ? (
+            <p className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 px-4 py-3 text-sm leading-6 text-cyan-50">
+              登録済みかどうかは画面上では表示しません。メールが届かない場合は、迷惑メールとSupabaseのメール設定を確認してください。
             </p>
           ) : null}
         </>
@@ -161,18 +191,20 @@ export function HostLoginCard({
           login(
             {
               email,
-              password,
+              password: isPasswordReset ? undefined : password,
               displayName,
-              intent: isSignUp ? "sign-up" : "sign-in",
+              intent: mode,
             },
-            "ホストアカウントを作成しました。確認メールが有効な場合は承認後にログインしてください。",
+            "登録リクエストを受け付けました。メールが届いた場合は確認リンクを開いてください。既に登録済みの場合はログイン、またはパスワード再設定を利用してください。",
           )
         }
         className="rounded-2xl bg-cyan-300 px-4 py-3 text-base font-semibold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isPending
           ? "送信中..."
-          : isSignUp
+          : isPasswordReset
+            ? "再設定メールを送る"
+            : isSignUp
             ? "無料でホスト登録"
             : "ホストとして入る"}
       </button>
@@ -189,7 +221,13 @@ export function HostLoginCard({
       ) : null}
 
       {message ? (
-        <p className="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">
+        <p
+          className={`rounded-2xl border px-4 py-3 text-sm ${
+            messageTone === "info"
+              ? "border-cyan-300/20 bg-cyan-300/10 text-cyan-50"
+              : "border-rose-400/20 bg-rose-400/10 text-rose-100"
+          }`}
+        >
           {message}
         </p>
       ) : null}
