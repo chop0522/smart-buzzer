@@ -1,6 +1,6 @@
 # Current Handoff
 
-Last updated: 2026-04-26 17:22 JST
+Last updated: 2026-04-26 18:17 JST
 
 This file is the short status handoff for ChatGPT Pro or the next operator.
 Do not paste secret values into this file.
@@ -10,12 +10,12 @@ Do not paste secret values into this file.
 - Project: Smart Buzzer
 - Workspace: `/Users/Yuya/smart-buzzer`
 - Branch: `main`
-- Current stable docs commit: `050a3c8 docs: refresh current handoff`
+- Current stable docs commit: `c5938b1 docs: refresh current handoff`
 - Current live-ready tag: `v0.1.6-live-env-ready`
 - Tag target: `e4de3d5 docs: add current handoff`
 - Production URL: `https://smart-buzzer.vercel.app`
-- Current Production deployment: `dpl_2GPgzxt1S6kkz5RdVTvAgJnd4cEG`
-- Current Production deployment URL: `https://smart-buzzer-qkcky17z6-chop0522s-projects.vercel.app`
+- Current Production deployment: `dpl_EA8rjjLgTSqubaU22ErsW13WiP7H`
+- Current Production deployment URL: `https://smart-buzzer-7ayh3v4g3-chop0522s-projects.vercel.app`
 - Current Production status: `Ready`
 
 ## Completed
@@ -109,6 +109,35 @@ Manual authenticated `/account` checklist:
 7. Confirm Customer Portal is disabled or unavailable when there is no existing Stripe customer, and becomes available only for an account with a Stripe customer.
 8. Do not complete payment without an explicit final approval.
 
+## 2026-04-26 18:17 JST Basic Auth Reset
+
+- Production `ADMIN_BASIC_AUTH_USER` and `ADMIN_BASIC_AUTH_PASSWORD` were reset because the previous sensitive values were not readable from Vercel.
+- New Basic Auth username: `smartbuzzer-admin`
+- New Basic Auth password was generated randomly and was not written to docs, logs, or chat.
+- At the time of reset, the password was copied to the Mac clipboard for direct browser entry.
+- Preview / Development env were not changed:
+  - Preview env count: `0`
+  - Development env count: `0`
+- Production was redeployed after the env update:
+  - Deployment: `dpl_EA8rjjLgTSqubaU22ErsW13WiP7H`
+  - URL: `https://smart-buzzer-7ayh3v4g3-chop0522s-projects.vercel.app`
+  - Status: `Ready`
+- Public smoke after redeploy:
+  - `/`: `200`, old name absent
+  - `/pricing`: `200`, old name absent
+  - `/legal/tokushoho`: `200`, old name absent
+  - `/legal/privacy`: `200`, old name absent
+  - `/legal/terms`: `200`, old name absent
+  - `/legal/cancellation`: `200`, old name absent
+  - `/account`: `401` unauthenticated due to Basic Auth; not `500`
+- Basic Auth smoke using the new credentials:
+  - `/host`: `200`, not `500`, old name absent
+  - `/account`: `200`, not `500`, old name absent
+- Host login after Basic Auth was not completed in this step.
+- Starter Checkout from authenticated `/account` was not opened in this step.
+- No real-card payment was attempted.
+- No cleanup, deletion, refund, cancellation, or Preview/Development live key operation was performed.
+
 ## Important Constraints
 
 - Do not run cleanup unless the user explicitly asks.
@@ -125,6 +154,7 @@ Manual authenticated `/account` checklist:
 - Tag `v0.1.6-live-env-ready` points at `e4de3d5`.
 - Commit `def832a` refreshes this handoff after tag confirmation.
 - Commit `050a3c8` records the 2026-04-26 17:09 handoff refresh and is pushed to `origin/main`.
+- Commit `c5938b1` records the 2026-04-26 17:22 post-push verification and is pushed to `origin/main`.
 - This handoff refresh should be committed and pushed as docs-only.
 - The worktree still has unrelated modified and untracked app/security files from earlier work.
 - Only docs files should be staged for handoff/status commits unless the user explicitly asks for app changes.
@@ -132,7 +162,7 @@ Manual authenticated `/account` checklist:
 ## Remaining Work
 
 - Push docs-only handoff refresh commit(s) to GitHub from an authenticated user terminal if the agent process cannot authenticate.
-- Authenticated `/account` smoke can be done later if Basic Auth / host login credentials are available.
+- Complete host login after Basic Auth, then perform authenticated `/account` smoke.
 - First live charge is still not done and should remain behind a final user confirmation gate.
 - After the first live charge, verify `/account?checkout=success`, Supabase subscription row, and Stripe webhook delivery.
 - Keep updating this file at each work boundary before asking ChatGPT Pro for the next plan.
