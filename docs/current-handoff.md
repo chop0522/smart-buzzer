@@ -1,6 +1,6 @@
 # Current Handoff
 
-Last updated: 2026-04-26 17:09 JST
+Last updated: 2026-04-26 17:22 JST
 
 This file is the short status handoff for ChatGPT Pro or the next operator.
 Do not paste secret values into this file.
@@ -10,12 +10,12 @@ Do not paste secret values into this file.
 - Project: Smart Buzzer
 - Workspace: `/Users/Yuya/smart-buzzer`
 - Branch: `main`
-- Current stable docs commit: `def832a docs: refresh current handoff`
+- Current stable docs commit: `050a3c8 docs: refresh current handoff`
 - Current live-ready tag: `v0.1.6-live-env-ready`
 - Tag target: `e4de3d5 docs: add current handoff`
 - Production URL: `https://smart-buzzer.vercel.app`
-- Current Production deployment: `dpl_3ZdyUyaDbQyLip45LCrnzQ1KyqfQ`
-- Current Production deployment URL: `https://smart-buzzer-doy095lk5-chop0522s-projects.vercel.app`
+- Current Production deployment: `dpl_2GPgzxt1S6kkz5RdVTvAgJnd4cEG`
+- Current Production deployment URL: `https://smart-buzzer-qkcky17z6-chop0522s-projects.vercel.app`
 - Current Production status: `Ready`
 
 ## Completed
@@ -75,6 +75,40 @@ Do not paste secret values into this file.
 - No real-card payment was attempted.
 - No cleanup, deletion, refund, cancellation, or Preview/Development live key operation was performed.
 
+## 2026-04-26 17:22 JST Post-Push Verification
+
+- User completed `git push origin main` from an authenticated terminal.
+- Local `origin/main` and `HEAD` both point to `050a3c8 docs: refresh current handoff`.
+- GitHub `main` contains `docs/current-handoff.md`.
+- Vercel Production post-push deployment:
+  - Deployment: `dpl_2GPgzxt1S6kkz5RdVTvAgJnd4cEG`
+  - URL: `https://smart-buzzer-qkcky17z6-chop0522s-projects.vercel.app`
+  - Status: `Ready`
+- Public smoke after push:
+  - `/`: `200`, old name absent
+  - `/pricing`: `200`, old name absent
+  - `/legal/tokushoho`: `200`, old name absent
+  - `/legal/privacy`: `200`, old name absent
+  - `/legal/terms`: `200`, old name absent
+  - `/legal/cancellation`: `200`, old name absent
+  - `/account`: `401` unauthenticated due to Basic Auth; not `500`
+- Authenticated `/account` smoke was not completed because `ADMIN_BASIC_AUTH_USER` and `ADMIN_BASIC_AUTH_PASSWORD` are sensitive Vercel env values and are not readable through env pull.
+- `HOST_DEMO_PASSWORD` was not available to the agent process.
+- Starter Checkout from authenticated `/account` was not opened in this step.
+- No real-card payment was attempted.
+- No cleanup, deletion, refund, cancellation, or Preview/Development live key operation was performed.
+
+Manual authenticated `/account` checklist:
+
+1. Open `https://smart-buzzer.vercel.app/account`.
+2. Complete Basic Auth in the browser.
+3. If redirected or prompted, complete host login.
+4. Confirm `/account` does not show `500`.
+5. Confirm the current plan/status/participant limit are displayed.
+6. Confirm the Stripe Checkout button appears when the account is eligible to upgrade.
+7. Confirm Customer Portal is disabled or unavailable when there is no existing Stripe customer, and becomes available only for an account with a Stripe customer.
+8. Do not complete payment without an explicit final approval.
+
 ## Important Constraints
 
 - Do not run cleanup unless the user explicitly asks.
@@ -90,6 +124,7 @@ Do not paste secret values into this file.
 - Commit `e4de3d5` adds this dedicated handoff file.
 - Tag `v0.1.6-live-env-ready` points at `e4de3d5`.
 - Commit `def832a` refreshes this handoff after tag confirmation.
+- Commit `050a3c8` records the 2026-04-26 17:09 handoff refresh and is pushed to `origin/main`.
 - This handoff refresh should be committed and pushed as docs-only.
 - The worktree still has unrelated modified and untracked app/security files from earlier work.
 - Only docs files should be staged for handoff/status commits unless the user explicitly asks for app changes.
