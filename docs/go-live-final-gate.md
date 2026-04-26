@@ -9,6 +9,91 @@
 - Git / Vercel / Stripe / Supabase / legal 表示の抜け漏れを 1 枚で見る
 - 実行担当者が「何を確認したか」を残す
 
+## 2026-04-26 Live Env / Read-Only Execution Log
+
+`2026-04-26 13:31 JST` 時点で、Production env の live 値反映、Production redeploy、read-only smoke、live Checkout open-only 確認を実施した。
+
+注意:
+
+- 実カード決済は実施していない
+- cleanup の追加実行はしていない
+- Stripe customer / invoice / temporary host は削除していない
+- live secret key / webhook secret の値はこのドキュメントに記録しない
+- 既存の未コミット変更は多数残っているため、ローカル dirty tree はデプロイしていない
+
+### Stripe Public / Business Info
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| Customer-facing business name | Pass | `SMART BUZZER` |
+| Statement descriptor | Pass | `SMART BUZZER` |
+| Support email / phone | Pass | Stripe Dashboard の public support info に設定済み |
+| Old name `七宝占術` | Pass | Dashboard 上の確認範囲では表示なし |
+
+### Git / Deployment Baseline
+
+| Field | Value |
+| --- | --- |
+| Branch | `main` |
+| HEAD | `05a94d4 Improve host onboarding UI` |
+| Remote | `origin/main` と一致 |
+| Recent legal commit | `785c9ee Update legal operator name` |
+| Tag | `v0.1.5-legal-ready` exists |
+| Worktree | Dirty. 既存の未コミット変更あり |
+
+未コミット変更はこの gate の実行対象外。Vercel の redeploy は既存 Production deployment を再ビルドし、ローカル変更を含めない方式で実施した。
+
+### Vercel Production Env
+
+| Env | Result | Notes |
+| --- | --- | --- |
+| `STRIPE_SECRET_KEY` | Updated | Production のみ。値は記録しない |
+| `STRIPE_WEBHOOK_SECRET` | Updated | Production のみ。値は記録しない |
+| `STRIPE_PRICE_STARTER_MONTHLY` | Updated | `price_1TOx5BDPUI63E9EhPCxfwkEk` |
+| `STRIPE_PRICE_PRO_MONTHLY` | Updated | `price_1TOx70DPUI63E9EhREVr5JW2` |
+| `STRIPE_PRICE_EXTRA_PACK_MONTHLY` | Updated | `price_1TOx8WDPUI63E9EhpLmcMZo7` |
+| `NEXT_PUBLIC_APP_URL` | Updated | `https://smart-buzzer.vercel.app` |
+| Preview / Development | Pass | live key は入れていない |
+
+### Production Redeploy
+
+| Field | Value |
+| --- | --- |
+| Previous deployment | `https://smart-buzzer-lrt1x6rgf-chop0522s-projects.vercel.app` |
+| New deployment | `https://smart-buzzer-7rnx202e9-chop0522s-projects.vercel.app` |
+| Deployment ID | `dpl_9ChZz9UWwCsaNDzUEuf6Mmb9dPQi` |
+| Target | `production` |
+| Status | `Ready` |
+| Alias | `https://smart-buzzer.vercel.app` assigned |
+
+### Read-Only Smoke
+
+| Route | Result | Notes |
+| --- | --- | --- |
+| `/` | `200` | Brand text present, old name absent |
+| `/pricing` | `200` | Brand text present, old name absent |
+| `/account` | `401` unauthenticated | Basic 認証が有効。`500` ではない |
+| `/legal/tokushoho` | `200` | Brand text present, old name absent |
+| `/legal/privacy` | `200` | Brand text present, old name absent |
+| `/legal/terms` | `200` | Brand text present, old name absent |
+| `/legal/cancellation` | `200` | Brand text present, old name absent |
+
+`/account` は本番 Basic 認証で保護されているため、未認証 HTTP smoke では `401` になる。アプリ内部の authenticated `/account` smoke は、この実行では未実施。
+
+### Stripe Live Catalog / Checkout Open-Only
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| Starter Price | Pass | live mode, `JPY 980 / month`, product `Smart Buzzer Starter` |
+| Pro Price | Pass | live mode, `JPY 1980 / month`, product `Smart Buzzer Pro` |
+| Extra Pack Price | Pass | live mode, `JPY 580 / month`, product `Smart Buzzer Extra Pack (+4)` |
+| Starter Checkout | Pass | live session opened, amount `¥980`, brand present, old name absent, test mode text absent |
+| Pro Checkout | Pass | live session opened, amount `¥1,980`, brand present, old name absent, test mode text absent |
+| Starter + Extra Pack 1 Checkout | Pass | live session opened, amount `¥1,560`, brand present, old name absent, test mode text absent |
+| Payment completion | Pass | 未実施。支払い直前まで進めていない |
+
+Checkout は open-only 確認として Stripe live Prices から live Checkout Session を作成し、ページ表示のみ確認した。実カード情報の入力・送信は行っていない。
+
 ## Fixed Constraints
 
 - この段階ではまだ live key を production に入れない
