@@ -36,27 +36,13 @@ function parseBasicAuth(authorization: string | null) {
 }
 
 function isProtectedAdminPath(pathname: string) {
-  if (pathname === "/host" || pathname.startsWith("/host/")) {
+  // User-facing host, account, billing, and room routes rely on app auth.
+  // Keep browser Basic Auth reserved for non-user-facing admin surfaces.
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     return true;
   }
 
-  if (pathname === "/account" || pathname.startsWith("/account/")) {
-    return true;
-  }
-
-  if (pathname === "/api/auth/host-login" || pathname === "/api/auth/host-logout") {
-    return true;
-  }
-
-  if (pathname.startsWith("/api/account/") || pathname.startsWith("/api/billing/")) {
-    return true;
-  }
-
-  if (pathname === "/api/rooms") {
-    return true;
-  }
-
-  return /^\/api\/rooms\/[^/]+\/(start|reset)$/.test(pathname);
+  return pathname.startsWith("/api/admin/");
 }
 
 export async function proxy(request: NextRequest) {

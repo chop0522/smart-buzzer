@@ -8,7 +8,7 @@ test.describe("production read-only smoke", () => {
     "Set PLAYWRIGHT_PRODUCTION_SMOKE=1 to run the read-only production smoke test.",
   );
 
-  test("public pages render and admin pages require Basic auth", async ({ page }) => {
+  test("public and host/account pages render without browser Basic auth", async ({ page }) => {
     await page.goto("/");
     await expect(
       page.getByRole("heading", { name: /早押しルームを作って/i }),
@@ -23,11 +23,15 @@ test.describe("production read-only smoke", () => {
     await expect(page.getByText("Pro", { exact: true }).first()).toBeVisible();
     await expect(page.getByText(/Extra Pack/i).first()).toBeVisible();
 
-    const hostResponse = await page.request.get("/host");
-    expect(hostResponse.status()).toBe(401);
+    await page.goto("/host");
+    await expect(
+      page.getByRole("heading", { name: /ホストログイン|無料でホスト登録/i }),
+    ).toBeVisible();
 
-    const accountResponse = await page.request.get("/account");
-    expect(accountResponse.status()).toBe(401);
+    await page.goto("/account");
+    await expect(
+      page.getByRole("heading", { name: "契約状況ページ" }),
+    ).toBeVisible();
 
     await page.goto("/legal/tokushoho");
     await expect(
