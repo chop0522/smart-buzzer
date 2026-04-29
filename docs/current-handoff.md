@@ -138,6 +138,42 @@ Manual authenticated `/account` checklist:
 - No real-card payment was attempted.
 - No cleanup, deletion, refund, cancellation, or Preview/Development live key operation was performed.
 
+## 2026-04-29 18:42 JST User Flow Basic Auth Removal / Checkout Open-Only
+
+- Commit `f38dbf5 fix: remove basic auth from user flows` was created and pushed to `origin/main` by the user from an authenticated terminal.
+- Browser Basic Auth was removed from user-facing host/account/auth/billing/room flows.
+- Basic Auth is now reserved for future non-user-facing `/admin` and `/api/admin/*` surfaces.
+- Verification before push:
+  - `npm run typecheck`: passed
+  - `npm run lint`: passed
+  - `npm run build`: passed
+- Production post-push smoke:
+  - `/host`: `200`; no browser Basic Auth prompt
+  - `/account`: `200`; no browser Basic Auth prompt
+  - `/api/auth/host-login`: app-level `400` for empty input; not Basic Auth `401`
+  - `npm run test:e2e:production`: passed
+- Authenticated `/account` smoke:
+  - Current plan: `Free`
+  - Status: `inactive`
+  - Participant limit: `4`
+  - Extra Packs: `0`
+  - Logout button displayed
+  - Customer Portal button disabled because no Stripe Customer exists yet
+- Starter live Checkout open-only verification:
+  - Checkout opened from authenticated `/account`
+  - Mode: live Checkout URL (`checkout.stripe.com`, live session prefix visible)
+  - Product: `Smart Buzzer Starter`
+  - Amount: `¥980 / month`
+  - Today's total: `¥980`
+  - Branding/display name: `SMART BUZZER`
+  - Old name `七宝占術`: not visible
+  - Test mode indicator: not visible
+  - Payment information was not entered
+  - The final `申し込む` button was not clicked
+- No real-card payment was attempted.
+- No cleanup, deletion, refund, cancellation, or Preview/Development live key operation was performed.
+- No live secret key, webhook secret, Checkout session URL, or host email address was written to docs.
+
 ## Important Constraints
 
 - Do not run cleanup unless the user explicitly asks.
@@ -155,6 +191,7 @@ Manual authenticated `/account` checklist:
 - Commit `def832a` refreshes this handoff after tag confirmation.
 - Commit `050a3c8` records the 2026-04-26 17:09 handoff refresh and is pushed to `origin/main`.
 - Commit `c5938b1` records the 2026-04-26 17:22 post-push verification and is pushed to `origin/main`.
+- Commit `f38dbf5` removes browser Basic Auth from user-facing flows and is pushed to `origin/main`.
 - This handoff refresh should be committed and pushed as docs-only.
 - The worktree still has unrelated modified and untracked app/security files from earlier work.
 - Only docs files should be staged for handoff/status commits unless the user explicitly asks for app changes.
@@ -162,7 +199,6 @@ Manual authenticated `/account` checklist:
 ## Remaining Work
 
 - Push docs-only handoff refresh commit(s) to GitHub from an authenticated user terminal if the agent process cannot authenticate.
-- Complete host login after Basic Auth, then perform authenticated `/account` smoke.
 - First live charge is still not done and should remain behind a final user confirmation gate.
 - After the first live charge, verify `/account?checkout=success`, Supabase subscription row, and Stripe webhook delivery.
 - Keep updating this file at each work boundary before asking ChatGPT Pro for the next plan.

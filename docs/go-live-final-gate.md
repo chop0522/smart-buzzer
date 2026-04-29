@@ -344,16 +344,25 @@ supabase db dump --linked --data-only -f supabase/data.live-pre-switch.sql
 
 | Check | Yes/No | Notes |
 | --- | --- | --- |
-| `/` が正常表示 |  |  |
-| `/pricing` が正常表示 |  |  |
-| `/account` が正常表示 |  |  |
-| Starter checkout が live mode の画面で開く |  |  |
-| Starter の金額が `¥980 / month` |  |  |
+| `/` が正常表示 | Yes | 2026-04-29 production smoke passed |
+| `/pricing` が正常表示 | Yes | 2026-04-29 production smoke passed |
+| `/account` が正常表示 | Yes | Authenticated account smoke passed; Free / inactive / participant limit 4 |
+| Starter checkout が live mode の画面で開く | Yes | Open-only check from authenticated `/account`; no payment submitted |
+| Starter の金額が `¥980 / month` | Yes | Stripe Checkout showed `Smart Buzzer Starter`, `¥980 / month`, today's total `¥980` |
 | Pro の金額が `¥1,980 / month` |  |  |
 | Extra Pack の金額が `¥580 / month` |  |  |
-| この段階ではまだ決済完了していない |  |  |
+| この段階ではまだ決済完了していない | Yes | Payment details were not entered; final `申し込む` button was not clicked |
 | Vercel logs に重大エラーがない |  |  |
 | Stripe webhook delivery に重大エラーがない |  |  |
+
+2026-04-29 notes:
+
+- Browser Basic Auth was removed from user-facing `/host`, `/account`, auth, billing, and room operation flows in commit `f38dbf5`.
+- Production `/host` and `/account` returned `200` without browser Basic Auth.
+- `npm run test:e2e:production` passed after the Basic Auth scope change.
+- Starter Checkout displayed `SMART BUZZER`; old name `七宝占術` was not visible.
+- Test mode indicator was not visible.
+- No Checkout session URL, live secret key, webhook secret, or host email address is recorded here.
 
 ## 9. First Live Charge Gate
 
