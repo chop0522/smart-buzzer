@@ -1,6 +1,6 @@
 # Current Handoff
 
-Last updated: 2026-04-26 18:17 JST
+Last updated: 2026-04-29 19:16 JST
 
 This file is the short status handoff for ChatGPT Pro or the next operator.
 Do not paste secret values into this file.
@@ -10,7 +10,8 @@ Do not paste secret values into this file.
 - Project: Smart Buzzer
 - Workspace: `/Users/Yuya/smart-buzzer`
 - Branch: `main`
-- Current stable docs commit: `c5938b1 docs: refresh current handoff`
+- Current pushed app commit: `f38dbf5 fix: remove basic auth from user flows`
+- Latest local docs commit before this update: `09a0ee7 docs: record checkout open-only verification`
 - Current live-ready tag: `v0.1.6-live-env-ready`
 - Tag target: `e4de3d5 docs: add current handoff`
 - Production URL: `https://smart-buzzer.vercel.app`
@@ -31,7 +32,7 @@ Do not paste secret values into this file.
   - Pro: `¥1,980 / month`
   - Starter + Extra Pack 1: `¥1,560 / month`
 - Checkout display showed Smart Buzzer branding, no visible `七宝占術`, and no test mode text.
-- No real-card payment was completed.
+- First live Starter real-card payment was completed and verified on 2026-04-29.
 - Results were recorded in `docs/go-live-final-gate.md`.
 - `docs/current-handoff.md` was created as the short ChatGPT Pro handoff file.
 - `v0.1.6-live-env-ready` annotated tag was created and confirmed on GitHub.
@@ -174,6 +175,49 @@ Manual authenticated `/account` checklist:
 - No cleanup, deletion, refund, cancellation, or Preview/Development live key operation was performed.
 - No live secret key, webhook secret, Checkout session URL, or host email address was written to docs.
 
+## 2026-04-29 19:16 JST First Live Charge Verification
+
+- User explicitly approved one real-card payment for Starter `¥980`.
+- Starter live Checkout was re-opened from authenticated `/account`.
+- Checkout confirmation before payment:
+  - Product: `Smart Buzzer Starter`
+  - Amount: `¥980 / month`
+  - Today's total: `¥980`
+  - Branding/display name: `SMART BUZZER`
+  - Old name `七宝占術`: not visible
+  - Test mode indicator: not visible
+- User completed the payment in the browser.
+- App verification:
+  - `/account?checkout=success`: loaded successfully
+  - Current plan: `Starter`
+  - Status: `active`
+  - Participant limit: `8`
+  - Extra Packs: `0`
+  - Customer Portal button: enabled
+- Supabase verification:
+  - Latest live `subscriptions` row has `plan=starter`, `status=active`, `participant_limit=8`, `extra_pack_quantity=0`
+  - Stripe customer and subscription references are present in the row, but full IDs are not recorded here
+  - Latest `processed_stripe_events` records for `customer.subscription.created` and `checkout.session.completed` are `completed` with no recorded error
+- Stripe Dashboard verification:
+  - Live webhook endpoint `smart-buzzer-production-webhook` is active
+  - `customer.subscription.created`: `200 OK`
+  - `checkout.session.completed`: `200 OK`
+  - Active subscription exists for `Smart Buzzer Starter`, `¥980 / month`, created 2026-04-29 19:07 JST
+  - Paid invoice exists for `¥980 JPY`, created 2026-04-29 19:07 JST
+- Customer Portal verification:
+  - Portal opened successfully
+  - Portal shows `Smart Buzzer Starter`, `1 month / ¥980`
+  - Next billing date shown as 2026-05-29
+  - Paid invoice history is visible
+- Not performed:
+  - No subscription cancellation
+  - No refund
+  - No Stripe customer / invoice / temporary host deletion
+  - No cleanup
+  - No Preview / Development live key operation
+  - No Pro or Extra Pack real payment
+- No live secret key, webhook secret, Checkout session URL, Customer Portal session URL, host email address, full Stripe customer ID, full subscription ID, or full invoice ID was written to docs.
+
 ## Important Constraints
 
 - Do not run cleanup unless the user explicitly asks.
@@ -199,8 +243,9 @@ Manual authenticated `/account` checklist:
 ## Remaining Work
 
 - Push docs-only handoff refresh commit(s) to GitHub from an authenticated user terminal if the agent process cannot authenticate.
-- First live charge is still not done and should remain behind a final user confirmation gate.
-- After the first live charge, verify `/account?checkout=success`, Supabase subscription row, and Stripe webhook delivery.
+- First live Starter charge has been completed and verified.
+- Next required user decision: keep subscription active, cancel immediately, schedule cancellation at period end, or refund. Do not perform cancellation or refund without explicit user confirmation.
+- If the docs-only verification commit is pushed successfully, create and push annotated tag `v1.0.0-live-verified`.
 - Keep updating this file at each work boundary before asking ChatGPT Pro for the next plan.
 
 ## Suggested Next Prompt

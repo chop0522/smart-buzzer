@@ -370,12 +370,23 @@ supabase db dump --linked --data-only -f supabase/data.live-pre-switch.sql
 
 | Check | Yes/No | Notes |
 | --- | --- | --- |
-| 実カード決済は Starter 1 回だけに限定する |  |  |
-| 決済後に `/account?checkout=success` を確認する |  |  |
-| Supabase `subscriptions` row の反映を確認する |  |  |
-| webhook success を確認する |  |  |
-| 解約の実施要否を決めた |  |  |
-| 返金の実施要否を決めた |  |  |
+| 実カード決済は Starter 1 回だけに限定する | Yes | 2026-04-29: Starter `¥980` one time only; no Pro or Extra Pack real payment |
+| 決済後に `/account?checkout=success` を確認する | Yes | 2026-04-29: Starter / active / participant limit 8 |
+| Supabase `subscriptions` row の反映を確認する | Yes | `plan=starter`, `status=active`, `participant_limit=8`, `extra_pack_quantity=0`; full Stripe IDs are not recorded |
+| webhook success を確認する | Yes | Stripe Dashboard live delivery: `customer.subscription.created` and `checkout.session.completed` were both `200 OK`; Supabase processed events completed with no error |
+| 解約の実施要否を決めた | No | User decision pending |
+| 返金の実施要否を決めた | No | User decision pending |
+
+2026-04-29 first live charge notes:
+
+- User explicitly approved one real-card payment for Starter `¥980`.
+- Checkout showed `SMART BUZZER`, `Smart Buzzer Starter`, `¥980 / month`, and no visible `七宝占術` or test mode indicator before payment.
+- User completed the payment in the browser.
+- Stripe Dashboard confirmed an active `Smart Buzzer Starter` subscription at `¥980 / month`.
+- Stripe Dashboard confirmed a paid invoice for `¥980 JPY`.
+- Customer Portal opened and showed `Smart Buzzer Starter`, `1 month / ¥980`, next billing date `2026-05-29`, and paid invoice history.
+- No cancellation, refund, cleanup, customer deletion, invoice deletion, temporary host deletion, Preview/Development live key operation, Pro real payment, or Extra Pack real payment was performed.
+- No live secret key, webhook secret, Checkout session URL, Customer Portal session URL, host email address, full Stripe customer ID, full subscription ID, or full invoice ID is recorded here.
 
 注意:
 
