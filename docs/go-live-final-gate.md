@@ -374,8 +374,8 @@ supabase db dump --linked --data-only -f supabase/data.live-pre-switch.sql
 | 決済後に `/account?checkout=success` を確認する | Yes | 2026-04-29: Starter / active / participant limit 8 |
 | Supabase `subscriptions` row の反映を確認する | Yes | `plan=starter`, `status=active`, `participant_limit=8`, `extra_pack_quantity=0`; full Stripe IDs are not recorded |
 | webhook success を確認する | Yes | Stripe Dashboard live delivery: `customer.subscription.created` and `checkout.session.completed` were both `200 OK`; Supabase processed events completed with no error |
-| 解約の実施要否を決めた | No | User decision pending |
-| 返金の実施要否を決めた | No | User decision pending |
+| 解約の実施要否を決めた | Yes | 2026-04-29: user explicitly chose immediate cancellation after first live charge verification |
+| 返金の実施要否を決めた | Yes | 2026-04-29: user explicitly chose full refund of the previous Starter payment |
 
 2026-04-29 first live charge notes:
 
@@ -387,6 +387,27 @@ supabase db dump --linked --data-only -f supabase/data.live-pre-switch.sql
 - Customer Portal opened and showed `Smart Buzzer Starter`, `1 month / ¥980`, next billing date `2026-05-29`, and paid invoice history.
 - No cancellation, refund, cleanup, customer deletion, invoice deletion, temporary host deletion, Preview/Development live key operation, Pro real payment, or Extra Pack real payment was performed.
 - No live secret key, webhook secret, Checkout session URL, Customer Portal session URL, host email address, full Stripe customer ID, full subscription ID, or full invoice ID is recorded here.
+
+2026-04-29 immediate cancellation / full refund notes:
+
+- Stripe Dashboard cancellation flow used immediate cancellation for the first live Starter subscription.
+- Refund option selected: previous payment `¥980`; prorated `¥979` was not selected.
+- Stripe Dashboard showed the subscription as canceled with an end time on 2026-04-29.
+- Stripe invoice/payment verification showed:
+  - Credit note issued for `¥980`
+  - Payment status refunded
+  - Invoice balance `¥0`
+  - Credit note creation request log `200 OK`
+- App verification after webhook processing:
+  - `/host`: `Free`, `inactive`, participant limit `4`, extra packs `0`
+  - `/account`: `Free`, `inactive`, participant limit `4`, extra packs `0`
+- Supabase verification after webhook processing:
+  - Latest live `subscriptions` row: `plan=free`, `status=inactive`, `participant_limit=4`, `extra_pack_quantity=0`, `stripe_subscription_status=canceled`
+  - Latest `processed_stripe_events` record for `customer.subscription.deleted`: `completed`, no recorded error
+- Production smoke after cancellation/refund:
+  - `/`, `/pricing`, `/account`, `/legal/tokushoho`, `/legal/privacy`, `/legal/terms`, `/legal/cancellation`: all `200`
+- No Stripe customer deletion, invoice deletion, temporary host deletion, cleanup, Preview/Development live key operation, Pro real payment, or Extra Pack real payment was performed.
+- No live secret key, webhook secret, Checkout session URL, Customer Portal session URL, host email address, full Stripe customer ID, full subscription ID, full invoice ID, full payment ID, or full credit note ID is recorded here.
 
 注意:
 

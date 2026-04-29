@@ -1,6 +1,6 @@
 # Current Handoff
 
-Last updated: 2026-04-29 19:16 JST
+Last updated: 2026-04-29 19:49 JST
 
 This file is the short status handoff for ChatGPT Pro or the next operator.
 Do not paste secret values into this file.
@@ -33,6 +33,7 @@ Do not paste secret values into this file.
   - Starter + Extra Pack 1: `¥1,560 / month`
 - Checkout display showed Smart Buzzer branding, no visible `七宝占術`, and no test mode text.
 - First live Starter real-card payment was completed and verified on 2026-04-29.
+- The first live Starter subscription was immediately canceled and fully refunded on 2026-04-29 after explicit user approval.
 - Results were recorded in `docs/go-live-final-gate.md`.
 - `docs/current-handoff.md` was created as the short ChatGPT Pro handoff file.
 - `v0.1.6-live-env-ready` annotated tag was created and confirmed on GitHub.
@@ -218,6 +219,45 @@ Manual authenticated `/account` checklist:
   - No Pro or Extra Pack real payment
 - No live secret key, webhook secret, Checkout session URL, Customer Portal session URL, host email address, full Stripe customer ID, full subscription ID, or full invoice ID was written to docs.
 
+## 2026-04-29 19:49 JST Immediate Cancellation / Full Refund
+
+- User explicitly chose immediate cancellation and refund after the first live Starter payment verification.
+- Stripe Dashboard cancellation flow:
+  - Cancellation timing: immediate, 2026-04-29
+  - Refund option: previous payment `¥980`
+  - Subscription status after action: canceled
+  - End time shown in Stripe Dashboard: 2026-04-29 19:46 JST
+- Stripe invoice/payment verification:
+  - Credit note was issued automatically for `¥980`
+  - Payment status shows refunded
+  - Invoice balance is `¥0`
+  - Stripe Dashboard request log for credit note creation showed `200 OK`
+- App verification:
+  - `/host`: current plan `Free`, status `inactive`, participant limit `4`, extra packs `0`
+  - `/account`: current plan `Free`, status `inactive`, participant limit `4`, extra packs `0`
+  - `/account` still shows Checkout and Customer Portal entry points without `500`
+- Supabase verification:
+  - Latest live `subscriptions` row has `plan=free`, `status=inactive`, `participant_limit=4`, `extra_pack_quantity=0`
+  - Stripe customer and subscription references are still present for audit/history, but full IDs are not recorded here
+  - `stripe_subscription_status=canceled`
+  - Latest `processed_stripe_events` record for `customer.subscription.deleted` is `completed` with no recorded error
+- Production smoke after cancellation/refund:
+  - `/`: `200`
+  - `/pricing`: `200`
+  - `/account`: `200`
+  - `/legal/tokushoho`: `200`
+  - `/legal/privacy`: `200`
+  - `/legal/terms`: `200`
+  - `/legal/cancellation`: `200`
+- Not performed:
+  - No Stripe customer deletion
+  - No Stripe invoice deletion
+  - No temporary host deletion
+  - No cleanup
+  - No Preview / Development live key operation
+  - No Pro or Extra Pack real payment
+- No live secret key, webhook secret, Checkout session URL, Customer Portal session URL, host email address, full Stripe customer ID, full subscription ID, full invoice ID, full payment ID, or full credit note ID was written to docs.
+
 ## Important Constraints
 
 - Do not run cleanup unless the user explicitly asks.
@@ -244,8 +284,9 @@ Manual authenticated `/account` checklist:
 
 - Push docs-only handoff refresh commit(s) to GitHub from an authenticated user terminal if the agent process cannot authenticate.
 - First live Starter charge has been completed and verified.
-- Next required user decision: keep subscription active, cancel immediately, schedule cancellation at period end, or refund. Do not perform cancellation or refund without explicit user confirmation.
-- If the docs-only verification commit is pushed successfully, create and push annotated tag `v1.0.0-live-verified`.
+- Immediate cancellation and full refund of the first live Starter charge have been completed and verified.
+- Do not perform additional cancellation, refund, charge, cleanup, deletion, or env changes without explicit user confirmation.
+- `v1.0.0-live-verified` is present locally on `44f6ab9 docs: record first live charge verification`; keep it pointing at the first-live-charge verification commit unless the user explicitly asks to retag.
 - Keep updating this file at each work boundary before asking ChatGPT Pro for the next plan.
 
 ## Suggested Next Prompt
